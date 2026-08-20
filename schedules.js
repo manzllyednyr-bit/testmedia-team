@@ -18,6 +18,8 @@ const scheduleForm =
 const scheduleList =
     document.getElementById("scheduleList");
 
+let editingScheduleId = null;
+
 
 /* ==========================================
    SHOW / HIDE FORM
@@ -38,14 +40,102 @@ function hideScheduleForm() {
         scheduleFormContainer.style.display = "none";
     }
 
+    editingScheduleId = null;
+
+    if (scheduleForm) {
+        scheduleForm.reset();
+    }
+
+    updateFormMode();
 }
 
+
+/* ==========================================
+   UPDATE FORM MODE
+   ========================================== */
+
+function updateFormMode() {
+
+    const formTitle =
+        scheduleFormContainer
+            ? scheduleFormContainer.querySelector("h2")
+            : null;
+
+    const formDescription =
+        scheduleFormContainer
+            ? scheduleFormContainer.querySelector(
+                ".section-header p"
+            )
+            : null;
+
+    const submitButton =
+        scheduleForm
+            ? scheduleForm.querySelector(
+                'button[type="submit"]'
+            )
+            : null;
+
+
+    if (editingScheduleId) {
+
+        if (formTitle) {
+            formTitle.textContent =
+                "Edit Schedule";
+        }
+
+        if (formDescription) {
+            formDescription.textContent =
+                "Update the media team schedule.";
+        }
+
+        if (submitButton) {
+            submitButton.textContent =
+                "Update Schedule";
+        }
+
+    } else {
+
+        if (formTitle) {
+            formTitle.textContent =
+                "Create Schedule";
+        }
+
+        if (formDescription) {
+            formDescription.textContent =
+                "Add a new media team schedule.";
+        }
+
+        if (submitButton) {
+            submitButton.textContent =
+                "Save Schedule";
+        }
+
+    }
+
+}
+
+
+/* ==========================================
+   CREATE BUTTONS
+   ========================================== */
 
 if (createScheduleBtn) {
 
     createScheduleBtn.addEventListener(
         "click",
-        showScheduleForm
+        function () {
+
+            editingScheduleId = null;
+
+            if (scheduleForm) {
+                scheduleForm.reset();
+            }
+
+            updateFormMode();
+
+            showScheduleForm();
+
+        }
     );
 
 }
@@ -55,7 +145,19 @@ if (createScheduleEmptyBtn) {
 
     createScheduleEmptyBtn.addEventListener(
         "click",
-        showScheduleForm
+        function () {
+
+            editingScheduleId = null;
+
+            if (scheduleForm) {
+                scheduleForm.reset();
+            }
+
+            updateFormMode();
+
+            showScheduleForm();
+
+        }
     );
 
 }
@@ -72,7 +174,7 @@ if (cancelScheduleBtn) {
 
 
 /* ==========================================
-   SAVE SCHEDULE
+   SAVE / UPDATE SCHEDULE
    ========================================== */
 
 if (scheduleForm) {
@@ -85,22 +187,34 @@ if (scheduleForm) {
 
 
             const title =
-                document.getElementById("eventName").value.trim();
+                document.getElementById(
+                    "eventName"
+                ).value.trim();
 
             const eventDate =
-                document.getElementById("scheduleDate").value;
+                document.getElementById(
+                    "scheduleDate"
+                ).value;
 
             const startTime =
-                document.getElementById("startTime").value;
+                document.getElementById(
+                    "startTime"
+                ).value;
 
             const endTime =
-                document.getElementById("endTime").value;
+                document.getElementById(
+                    "endTime"
+                ).value;
 
             const location =
-                document.getElementById("location").value.trim();
+                document.getElementById(
+                    "location"
+                ).value.trim();
 
             const description =
-                document.getElementById("description").value.trim();
+                document.getElementById(
+                    "description"
+                ).value.trim();
 
 
             if (
@@ -111,7 +225,9 @@ if (scheduleForm) {
                 !location
             ) {
 
-                alert("Please complete all required fields.");
+                alert(
+                    "Please complete all required fields."
+                );
 
                 return;
 
@@ -132,33 +248,111 @@ if (scheduleForm) {
             const {
                 data: { user },
                 error: userError
-            } = await supabaseClient.auth.getUser();
+            } =
+                await supabaseClient.auth.getUser();
 
 
             if (userError || !user) {
 
-                alert("You are not logged in.");
+                alert(
+                    "You are not logged in."
+                );
 
                 return;
 
             }
 
 
-            const { data, error } =
-                await supabaseClient
+            /* ==================================
+               UPDATE EXISTING SCHEDULE
+               ================================== */
+
+            if (editingScheduleId) {
+
+                const {
+                    data,
+                    error
+                } = await supabaseClient
                     .from("schedules")
-                    .insert([
-                        {
-                            title: title,
-                            event_date: eventDate,
-                            start_time: startTime,
-                            end_time: endTime,
-                            location: location,
-                            description: description,
-                            created_by: user.id
-                        }
-                    ])
+                    .update({
+                        title: title,
+                        event_date: eventDate,
+                        start_time: startTime,
+                        end_time: endTime,
+                        location: location,
+                        description: description
+                    })
+                    .eq(
+                        "id",
+                        editingScheduleId
+                    )
                     .select();
+
+
+                if (error) {
+
+                    console.error(
+                        "Schedule update error:",
+                        error
+                    );
+
+                    alert(
+                        "Could not update schedule: " +
+                        error.message
+                    );
+
+                    return;
+
+                }
+
+
+                console.log(
+                    "Schedule updated:",
+                    data
+                );
+
+
+                alert(
+                    "Schedule updated successfully!"
+                );
+
+
+                editingScheduleId = null;
+
+                scheduleForm.reset();
+
+                updateFormMode();
+
+                hideScheduleForm();
+
+                loadSchedules();
+
+                return;
+
+            }
+
+
+            /* ==================================
+               CREATE NEW SCHEDULE
+               ================================== */
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+                .from("schedules")
+                .insert([
+                    {
+                        title: title,
+                        event_date: eventDate,
+                        start_time: startTime,
+                        end_time: endTime,
+                        location: location,
+                        description: description,
+                        created_by: user.id
+                    }
+                ])
+                .select();
 
 
             if (error) {
@@ -247,7 +441,9 @@ async function loadSchedules() {
                     📅
                 </div>
 
-                <h3>No schedules yet</h3>
+                <h3>
+                    No schedules yet
+                </h3>
 
                 <p>
                     Create your first media schedule
@@ -288,7 +484,9 @@ async function loadSchedules() {
     }
 
 
-    /* LOAD PERSONNEL */
+    /* ======================================
+       LOAD PERSONNEL
+       ====================================== */
 
     const {
         data: personnel,
@@ -314,14 +512,18 @@ async function loadSchedules() {
     }
 
 
-    /* LOAD ASSIGNMENTS */
+    /* ======================================
+       LOAD ASSIGNMENTS
+       ====================================== */
 
     const {
         data: assignments,
         error: assignmentError
     } = await supabaseClient
         .from("assignments")
-        .select("id, schedule_id, personnel_id");
+        .select(
+            "id, schedule_id, personnel_id"
+        );
 
 
     if (assignmentError) {
@@ -339,119 +541,189 @@ async function loadSchedules() {
     scheduleList.innerHTML = "";
 
 
-    schedules.forEach(function (schedule) {
+    /* ======================================
+       DISPLAY SCHEDULES
+       ====================================== */
 
-        const row =
-            document.createElement("div");
+    schedules.forEach(
+        function (schedule) {
 
-        row.className = "schedule-row";
-
-
-        /* FIND ASSIGNMENT */
-
-        const assignment =
-            assignments.find(function (item) {
-
-                return item.schedule_id === schedule.id;
-
-            });
+            const row =
+                document.createElement(
+                    "div"
+                );
 
 
-        let personnelHTML = "";
+            row.className =
+                "schedule-row";
 
 
-        if (assignment) {
+            /* FIND ASSIGNMENTS */
 
-            const assignedPerson =
-                personnel.find(function (person) {
+            const scheduleAssignments =
+                assignments.filter(
+                    function (item) {
 
-                    return person.id ===
-                        assignment.personnel_id;
+                        return item.schedule_id ===
+                            schedule.id;
 
-                });
-
-
-            personnelHTML = `
-                <span>
-                    ${
-                        assignedPerson
-                            ? assignedPerson.full_name
-                            : "Assigned"
                     }
-                </span>
+                );
+
+
+            let personnelHTML = "";
+
+
+            if (
+                scheduleAssignments.length > 0
+            ) {
+
+                const names =
+                    scheduleAssignments.map(
+                        function (assignment) {
+
+                            const person =
+                                personnel.find(
+                                    function (person) {
+
+                                        return person.id ===
+                                            assignment.personnel_id;
+
+                                    }
+                                );
+
+
+                            return person
+                                ? person.full_name
+                                : "Unknown";
+
+                        }
+                    );
+
+
+                personnelHTML = `
+                    <span>
+                        ${names.join(", ")}
+                    </span>
+                `;
+
+            } else {
+
+                personnelHTML = `
+                    <select
+                        class="personnel-select"
+                        data-schedule-id="${schedule.id}">
+
+                        <option value="">
+                            Select Personnel
+                        </option>
+
+                        ${
+                            personnel.map(
+                                function (person) {
+
+                                    return `
+                                        <option value="${person.id}">
+                                            ${person.full_name}
+                                        </option>
+                                    `;
+
+                                }
+                            ).join("")
+                        }
+
+                    </select>
+
+                    <button
+                        type="button"
+                        class="primary-button assign-button"
+                        data-schedule-id="${schedule.id}">
+
+                        Assign
+
+                    </button>
+                `;
+
+            }
+
+
+            /* ==================================
+               ROW HTML
+               ================================== */
+
+            row.innerHTML = `
+
+                <div>
+                    ${escapeHTML(schedule.title)}
+                </div>
+
+                <div>
+                    ${escapeHTML(schedule.event_date)}
+                </div>
+
+                <div>
+                    ${formatTime(schedule.start_time)}
+                    -
+                    ${formatTime(schedule.end_time)}
+                </div>
+
+                <div>
+                    ${escapeHTML(schedule.location)}
+                </div>
+
+                <div>
+
+                    ${personnelHTML}
+
+                    <div
+                        style="
+                            margin-top: 8px;
+                            display: flex;
+                            gap: 6px;
+                            flex-wrap: wrap;
+                        "
+                    >
+
+                        <button
+                            type="button"
+                            class="primary-button edit-schedule-button"
+                            data-schedule-id="${schedule.id}">
+
+                            Edit
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="primary-button delete-schedule-button"
+                            data-schedule-id="${schedule.id}"
+                            style="
+                                background: #b42318;
+                            ">
+
+                            Delete
+
+                        </button>
+
+                    </div>
+
+                </div>
+
             `;
 
-        } else {
 
-            personnelHTML = `
-                <select
-                    class="personnel-select"
-                    data-schedule-id="${schedule.id}">
-
-                    <option value="">
-                        Select Personnel
-                    </option>
-
-                    ${
-                        personnel.map(function (person) {
-
-                            return `
-                                <option value="${person.id}">
-                                    ${person.full_name}
-                                </option>
-                            `;
-
-                        }).join("")
-                    }
-
-                </select>
-
-                <button
-                    type="button"
-                    class="primary-button assign-button"
-                    data-schedule-id="${schedule.id}">
-
-                    Assign
-
-                </button>
-            `;
+            scheduleList.appendChild(
+                row
+            );
 
         }
+    );
 
 
-        row.innerHTML = `
-
-            <div>
-                ${schedule.title}
-            </div>
-
-            <div>
-                ${schedule.event_date}
-            </div>
-
-            <div>
-                ${formatTime(schedule.start_time)}
-                -
-                ${formatTime(schedule.end_time)}
-            </div>
-
-            <div>
-                ${schedule.location}
-            </div>
-
-            <div>
-                ${personnelHTML}
-            </div>
-
-        `;
-
-
-        scheduleList.appendChild(row);
-
-    });
-
-
-    /* ASSIGN BUTTONS */
+    /* ======================================
+       ASSIGN BUTTONS
+       ====================================== */
 
     const assignButtons =
         document.querySelectorAll(
@@ -459,14 +731,60 @@ async function loadSchedules() {
         );
 
 
-    assignButtons.forEach(function (button) {
+    assignButtons.forEach(
+        function (button) {
 
-        button.addEventListener(
-            "click",
-            assignPersonnel
+            button.addEventListener(
+                "click",
+                assignPersonnel
+            );
+
+        }
+    );
+
+
+    /* ======================================
+       EDIT BUTTONS
+       ====================================== */
+
+    const editButtons =
+        document.querySelectorAll(
+            ".edit-schedule-button"
         );
 
-    });
+
+    editButtons.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                editSchedule
+            );
+
+        }
+    );
+
+
+    /* ======================================
+       DELETE BUTTONS
+       ====================================== */
+
+    const deleteButtons =
+        document.querySelectorAll(
+            ".delete-schedule-button"
+        );
+
+
+    deleteButtons.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                deleteSchedule
+            );
+
+        }
+    );
 
 }
 
@@ -509,12 +827,15 @@ async function assignPersonnel(event) {
     const {
         data: { user },
         error: userError
-    } = await supabaseClient.auth.getUser();
+    } =
+        await supabaseClient.auth.getUser();
 
 
     if (userError || !user) {
 
-        alert("You are not logged in.");
+        alert(
+            "You are not logged in."
+        );
 
         return;
 
@@ -523,7 +844,8 @@ async function assignPersonnel(event) {
 
     button.disabled = true;
 
-    button.textContent = "Assigning...";
+    button.textContent =
+        "Assigning...";
 
 
     const {
@@ -555,7 +877,8 @@ async function assignPersonnel(event) {
 
         button.disabled = false;
 
-        button.textContent = "Assign";
+        button.textContent =
+            "Assign";
 
         return;
 
@@ -570,6 +893,227 @@ async function assignPersonnel(event) {
 
     alert(
         "Personnel assigned successfully!"
+    );
+
+
+    loadSchedules();
+
+}
+
+
+/* ==========================================
+   EDIT SCHEDULE
+   ========================================== */
+
+async function editSchedule(event) {
+
+    const button =
+        event.currentTarget;
+
+
+    const scheduleId =
+        button.dataset.scheduleId;
+
+
+    const {
+        data: schedule,
+        error
+    } = await supabaseClient
+        .from("schedules")
+        .select("*")
+        .eq("id", scheduleId)
+        .single();
+
+
+    if (error) {
+
+        console.error(
+            "Could not load schedule:",
+            error
+        );
+
+        alert(
+            "Could not load schedule: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    editingScheduleId =
+        schedule.id;
+
+
+    document.getElementById(
+        "eventName"
+    ).value =
+        schedule.title || "";
+
+
+    document.getElementById(
+        "scheduleDate"
+    ).value =
+        schedule.event_date || "";
+
+
+    document.getElementById(
+        "startTime"
+    ).value =
+        schedule.start_time
+            ? schedule.start_time.substring(
+                0,
+                5
+            )
+            : "";
+
+
+    document.getElementById(
+        "endTime"
+    ).value =
+        schedule.end_time
+            ? schedule.end_time.substring(
+                0,
+                5
+            )
+            : "";
+
+
+    document.getElementById(
+        "location"
+    ).value =
+        schedule.location || "";
+
+
+    document.getElementById(
+        "description"
+    ).value =
+        schedule.description || "";
+
+
+    updateFormMode();
+
+    showScheduleForm();
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* ==========================================
+   DELETE SCHEDULE
+   ========================================== */
+
+async function deleteSchedule(event) {
+
+    const button =
+        event.currentTarget;
+
+
+    const scheduleId =
+        button.dataset.scheduleId;
+
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this schedule?\n\nThis will also remove its personnel assignments."
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Deleting...";
+
+
+    /* ======================================
+       DELETE ASSIGNMENTS FIRST
+       ====================================== */
+
+    const {
+        error: assignmentDeleteError
+    } = await supabaseClient
+        .from("assignments")
+        .delete()
+        .eq(
+            "schedule_id",
+            scheduleId
+        );
+
+
+    if (assignmentDeleteError) {
+
+        console.error(
+            "Assignment delete error:",
+            assignmentDeleteError
+        );
+
+        alert(
+            "Could not delete schedule assignments: " +
+            assignmentDeleteError.message
+        );
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Delete";
+
+        return;
+
+    }
+
+
+    /* ======================================
+       DELETE SCHEDULE
+       ====================================== */
+
+    const {
+        error
+    } = await supabaseClient
+        .from("schedules")
+        .delete()
+        .eq(
+            "id",
+            scheduleId
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Schedule delete error:",
+            error
+        );
+
+        alert(
+            "Could not delete schedule: " +
+            error.message
+        );
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Delete";
+
+        return;
+
+    }
+
+
+    alert(
+        "Schedule deleted successfully!"
     );
 
 
@@ -594,7 +1138,10 @@ function formatTime(time) {
 
 
     let hour =
-        parseInt(parts[0]);
+        parseInt(
+            parts[0],
+            10
+        );
 
 
     const minute =
@@ -622,7 +1169,35 @@ function formatTime(time) {
 
 
 /* ==========================================
+   HTML SAFETY
+   ========================================== */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ==========================================
    INITIAL LOAD
    ========================================== */
+
+updateFormMode();
 
 loadSchedules();
