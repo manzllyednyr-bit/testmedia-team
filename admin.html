@@ -8,13 +8,193 @@
     <title>Admin Dashboard - Media Team</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        /* =========================================
+           DASHBOARD CALENDAR
+           ========================================= */
+
+        .dashboard-calendar {
+            margin-top: 25px;
+        }
+
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .calendar-controls h2 {
+            margin: 0;
+            color: #123f6d;
+            font-size: 22px;
+        }
+
+        .calendar-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .calendar-day-name {
+            background: #f8fafc;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: #667085;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .calendar-day {
+            min-height: 120px;
+            padding: 9px;
+            border-top: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .calendar-day.other-month {
+            background: #f8fafc;
+            color: #98a2b3;
+        }
+
+        .calendar-number {
+            font-weight: bold;
+            margin-bottom: 7px;
+            font-size: 13px;
+        }
+
+        .calendar-event {
+            background: #e8f1fa;
+            color: #123f6d;
+            padding: 6px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .calendar-event:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-event strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .calendar-event small {
+            display: block;
+            color: #667085;
+            margin-top: 2px;
+        }
+
+
+        /* =========================================
+           SCHEDULE DETAILS MODAL
+           ========================================= */
+
+        .schedule-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .schedule-modal {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 14px;
+            padding: 30px;
+            position: relative;
+
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .schedule-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 16px;
+
+            border: none;
+            background: transparent;
+
+            font-size: 28px;
+            color: #667085;
+
+            cursor: pointer;
+        }
+
+        .schedule-modal-close:hover {
+            color: #123f6d;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+           ========================================= */
+
+        @media (max-width: 800px) {
+
+            .calendar-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .calendar-day {
+                min-height: 95px;
+                padding: 6px;
+            }
+
+            .calendar-day-name {
+                font-size: 9px;
+                padding: 9px 3px;
+            }
+
+            .calendar-event {
+                font-size: 9px;
+                padding: 4px;
+            }
+
+            .calendar-event small {
+                font-size: 8px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+
+    <!-- =========================================
+         SIDEBAR
+         ========================================= -->
+
     <aside class="sidebar">
 
         <div class="sidebar-logo">
@@ -24,48 +204,86 @@
             </div>
 
             <div>
-                <h2>Media Team</h2>
-                <p>Scheduling System</p>
+
+                <h2>
+                    Media Team
+                </h2>
+
+                <p>
+                    Scheduling System
+                </p>
+
             </div>
 
         </div>
 
 
-        <!-- NAVIGATION -->
         <nav class="navigation">
 
-            <a href="admin.html" class="nav-item active">
+            <a
+                href="admin.html"
+                class="nav-item active">
+
                 Dashboard
+
             </a>
 
-            <a href="schedules.html" class="nav-item">
+
+            <a
+                href="schedules.html"
+                class="nav-item">
+
                 Schedules
+
             </a>
 
-            <a href="calendar.html" class="nav-item">
+
+            <a
+                href="calendar.html"
+                class="nav-item">
+
                 Calendar
+
             </a>
 
-            <a href="personnel.html" class="nav-item">
+
+            <a
+                href="personnel.html"
+                class="nav-item">
+
                 Personnel
+
             </a>
 
-            <a href="#" class="nav-item">
+
+            <a
+                href="#"
+                class="nav-item">
+
                 Reports
+
             </a>
 
         </nav>
 
 
-        <!-- SIDEBAR BOTTOM -->
         <div class="sidebar-bottom">
 
-            <a href="#" class="nav-item">
+            <a
+                href="#"
+                class="nav-item">
+
                 Settings
+
             </a>
 
-            <a href="index.html" class="nav-item">
+
+            <a
+                href="index.html"
+                class="nav-item">
+
                 Logout
+
             </a>
 
         </div>
@@ -73,10 +291,16 @@
     </aside>
 
 
-    <!-- MAIN CONTENT -->
+
+    <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
     <main class="main-content">
 
+
         <!-- HEADER -->
+
         <header class="dashboard-header">
 
             <div>
@@ -115,10 +339,16 @@
         </header>
 
 
-        <!-- STATISTICS -->
+
+        <!-- =========================================
+             STATISTICS
+             ========================================= -->
+
         <section class="stats-grid">
 
+
             <!-- TOTAL SCHEDULES -->
+
             <div class="stat-card">
 
                 <div class="stat-icon">
@@ -141,6 +371,7 @@
 
 
             <!-- TOTAL PERSONNEL -->
+
             <div class="stat-card">
 
                 <div class="stat-icon">
@@ -163,6 +394,7 @@
 
 
             <!-- ASSIGNED HOURS -->
+
             <div class="stat-card">
 
                 <div class="stat-icon">
@@ -185,6 +417,7 @@
 
 
             <!-- UPCOMING -->
+
             <div class="stat-card">
 
                 <div class="stat-icon">
@@ -205,22 +438,28 @@
 
             </div>
 
+
         </section>
 
 
-        <!-- UPCOMING SCHEDULES -->
-        <section class="dashboard-section">
+
+        <!-- =========================================
+             CALENDAR
+             ========================================= -->
+
+        <section class="dashboard-section dashboard-calendar">
+
 
             <div class="section-header">
 
                 <div>
 
                     <h2>
-                        Upcoming Schedules
+                        Schedule Calendar
                     </h2>
 
                     <p>
-                        Recently scheduled media duties
+                        View all media team schedules by date.
                     </p>
 
                 </div>
@@ -238,21 +477,163 @@
             </div>
 
 
-            <!-- SCHEDULE TABLE -->
-            <div class="schedule-table">
+            <!-- CALENDAR CONTROLS -->
 
-                <div class="table-header">
+            <div class="calendar-controls">
 
-                    <span>Event</span>
-                    <span>Date</span>
-                    <span>Time</span>
-                    <span>Location</span>
-                    <span>Personnel</span>
+
+                <div class="calendar-buttons">
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="previousMonthBtn">
+
+                        ← Previous
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="todayBtn">
+
+                        Today
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="nextMonthBtn">
+
+                        Next →
+
+                    </button>
 
                 </div>
 
 
-                <!-- EMPTY STATE -->
+                <h2 id="currentMonth">
+                    Loading...
+                </h2>
+
+            </div>
+
+
+
+            <!-- DAY NAMES -->
+
+            <div class="calendar-grid">
+
+
+                <div class="calendar-day-name">
+                    Sunday
+                </div>
+
+
+                <div class="calendar-day-name">
+                    Monday
+                </div>
+
+
+                <div class="calendar-day-name">
+                    Tuesday
+                </div>
+
+
+                <div class="calendar-day-name">
+                    Wednesday
+                </div>
+
+
+                <div class="calendar-day-name">
+                    Thursday
+                </div>
+
+
+                <div class="calendar-day-name">
+                    Friday
+                </div>
+
+
+                <div class="calendar-day-name">
+                    Saturday
+                </div>
+
+
+            </div>
+
+
+
+            <!-- CALENDAR DAYS -->
+
+            <div
+                id="calendarDays"
+                class="calendar-grid">
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             UPCOMING SCHEDULES
+             ========================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Upcoming Schedules
+                    </h2>
+
+                    <p>
+                        Recently scheduled media duties
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="schedule-table">
+
+
+                <div class="table-header">
+
+                    <span>
+                        Event
+                    </span>
+
+                    <span>
+                        Date
+                    </span>
+
+                    <span>
+                        Time
+                    </span>
+
+                    <span>
+                        Location
+                    </span>
+
+                    <span>
+                        Personnel
+                    </span>
+
+                </div>
+
+
                 <div class="empty-state">
 
                     <div class="empty-icon">
@@ -264,8 +645,10 @@
                     </h3>
 
                     <p>
-                        Create your first media schedule to get started.
+                        Create your first media schedule
+                        to get started.
                     </p>
+
 
                     <button
                         type="button"
@@ -278,23 +661,46 @@
 
                 </div>
 
+
             </div>
 
+
         </section>
+
 
     </main>
 
 </div>
 
 
-<!-- SUPABASE -->
+
+<!-- =========================================
+     SUPABASE
+     ========================================= -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- AUTHENTICATION -->
+
+<!-- =========================================
+     AUTHENTICATION
+     ========================================= -->
+
 <script src="script.js"></script>
 
-<!-- ADMIN DASHBOARD -->
+
+<!-- =========================================
+     ADMIN DASHBOARD
+     ========================================= -->
+
 <script src="admin.js"></script>
+
+
+<!-- =========================================
+     DASHBOARD CALENDAR
+     ========================================= -->
+
+<script src="calendar.js"></script>
+
 
 </body>
 
