@@ -1,14 +1,11 @@
-// Supabase connection
 const SUPABASE_URL = "https://mvoetibxiqazxbkbxguf.supabase.co/rest/v1/";
-const SUPABASE_PUBLISHABLE_KEY = sb_publishable_Apqxwb14MZ74RMnKlZLdjg_e_ZnURIFE";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Apqxwb14MZ74RMnKlZLdjg_e_ZnURIF";
 
 const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
 );
 
-
-// Login form
 const loginForm = document.querySelector("form");
 
 loginForm.addEventListener("submit", async function (event) {
