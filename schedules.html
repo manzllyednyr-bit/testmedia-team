@@ -2,177 +2,347 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Schedules - Media Team</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+    <title>
+        Schedules - Media Team
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
 </head>
+
 
 <body>
 
+
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+
+    <!-- =========================================
+         SIDEBAR
+         ========================================= -->
+
     <aside class="sidebar">
 
+
         <div class="sidebar-logo">
-            <div class="logo">MT</div>
+
+            <div class="logo">
+                MT
+            </div>
+
 
             <div>
-                <h2>Media Team</h2>
-                <p>Scheduling System</p>
+
+                <h2>
+                    Media Team
+                </h2>
+
+                <p>
+                    Scheduling System
+                </p>
+
             </div>
+
         </div>
+
+
+        <!-- NAVIGATION -->
 
         <nav class="navigation">
 
-            <a href="admin.html" class="nav-item">
+
+            <a
+                href="admin.html"
+                class="nav-item">
+
                 Dashboard
+
             </a>
 
-            <a href="schedules.html" class="nav-item active">
+
+            <a
+                href="schedules.html"
+                class="nav-item active">
+
                 Schedules
-            </a>
-            
 
-            <a href="#" class="nav-item">
+            </a>
+
+
+            <a
+                href="personnel.html"
+                class="nav-item">
+
                 Personnel
+
             </a>
 
-            <a href="#" class="nav-item">
+
+            <a
+                href="#"
+                class="nav-item">
+
                 Reports
+
             </a>
+
 
         </nav>
 
+
+        <!-- SIDEBAR BOTTOM -->
+
         <div class="sidebar-bottom">
 
-            <a href="#" class="nav-item">
+
+            <a
+                href="#"
+                class="nav-item">
+
                 Settings
+
             </a>
 
-            <a href="index.html" class="nav-item">
+
+            <a
+                href="index.html"
+                class="nav-item">
+
                 Logout
+
             </a>
+
 
         </div>
+
 
     </aside>
 
 
-    <!-- MAIN CONTENT -->
+
+    <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
     <main class="main-content">
 
-        <div class="dashboard-header">
+
+        <!-- HEADER -->
+
+        <header class="dashboard-header">
+
 
             <div>
-                <h1>Schedules</h1>
-                <p>Manage media team assignments and schedules.</p>
+
+                <h1>
+                    Schedules
+                </h1>
+
+                <p>
+                    Manage media team assignments and schedules.
+                </p>
+
             </div>
 
+
             <div class="admin-profile">
+
 
                 <div class="profile-circle">
                     A
                 </div>
 
+
                 <div>
-                    <strong>Admin</strong>
-                    <small>Media Director</small>
+
+                    <strong>
+                        Admin
+                    </strong>
+
+                    <small>
+                        Media Director
+                    </small>
+
                 </div>
+
 
             </div>
 
-        </div>
+
+        </header>
 
 
-        <!-- SCHEDULE SECTION -->
+
+        <!-- =========================================
+             SCHEDULE SECTION
+             ========================================= -->
+
         <div class="dashboard-section">
+
 
             <div class="section-header">
 
+
                 <div>
-                    <h2>All Schedules</h2>
-                    <p>Create and manage upcoming media duties.</p>
+
+                    <h2>
+                        All Schedules
+                    </h2>
+
+                    <p>
+                        Create and manage upcoming media duties.
+                    </p>
+
                 </div>
 
+
                 <button
+                    type="button"
                     class="primary-button"
                     id="createScheduleBtn">
+
                     + Create Schedule
+
                 </button>
+
 
             </div>
 
 
-            <!-- SCHEDULE LIST -->
+
+            <!-- =====================================
+                 SCHEDULE TABLE
+                 ===================================== -->
+
             <div class="schedule-table">
+
 
                 <div class="table-header">
 
-                    <div>Event</div>
-                    <div>Date</div>
-                    <div>Time</div>
-                    <div>Location</div>
-                    <div>Personnel</div>
+                    <div>
+                        Event
+                    </div>
+
+                    <div>
+                        Date
+                    </div>
+
+                    <div>
+                        Time
+                    </div>
+
+                    <div>
+                        Location
+                    </div>
+
+                    <div>
+                        Personnel
+                    </div>
 
                 </div>
 
 
+
+                <!-- SCHEDULE LIST -->
+
                 <div id="scheduleList">
 
+
                     <div class="empty-state">
+
 
                         <div class="empty-icon">
                             📅
                         </div>
 
-                        <h3>No schedules yet</h3>
+
+                        <h3>
+                            No schedules yet
+                        </h3>
+
 
                         <p>
-                            Create your first media schedule to get started.
+                            Create your first media schedule
+                            to get started.
                         </p>
+
 
                         <button
                             type="button"
                             class="primary-button"
                             id="createScheduleEmptyBtn">
+
                             Create Schedule
+
                         </button>
+
 
                     </div>
 
+
                 </div>
+
 
             </div>
 
 
-            <!-- CREATE SCHEDULE FORM -->
+
+            <!-- =====================================
+                 CREATE SCHEDULE FORM
+                 ===================================== -->
+
             <div
                 id="scheduleFormContainer"
-                style="display: none; margin-top: 25px;">
+                style="
+                    display: none;
+                    margin-top: 25px;
+                ">
+
 
                 <div class="dashboard-section">
 
+
                     <div class="section-header">
 
+
                         <div>
-                            <h2>Create Schedule</h2>
-                            <p>Add a new media team schedule.</p>
+
+                            <h2>
+                                Create Schedule
+                            </h2>
+
+                            <p>
+                                Add a new media team schedule.
+                            </p>
+
                         </div>
+
 
                     </div>
 
 
+
                     <form id="scheduleForm">
 
+
+                        <!-- EVENT NAME -->
+
                         <div class="form-group">
+
 
                             <label for="eventName">
                                 Event Name
                             </label>
+
 
                             <input
                                 type="text"
@@ -180,56 +350,80 @@
                                 placeholder="Example: Sunday Worship Service"
                                 required>
 
+
                         </div>
 
 
+
+                        <!-- DATE -->
+
                         <div class="form-group">
+
 
                             <label for="scheduleDate">
                                 Date
                             </label>
+
 
                             <input
                                 type="date"
                                 id="scheduleDate"
                                 required>
 
+
                         </div>
 
 
+
+                        <!-- START TIME -->
+
                         <div class="form-group">
+
 
                             <label for="startTime">
                                 Start Time
                             </label>
+
 
                             <input
                                 type="time"
                                 id="startTime"
                                 required>
 
+
                         </div>
 
 
+
+                        <!-- END TIME -->
+
                         <div class="form-group">
+
 
                             <label for="endTime">
                                 End Time
                             </label>
+
 
                             <input
                                 type="time"
                                 id="endTime"
                                 required>
 
+
                         </div>
 
 
+
+                        <!-- LOCATION -->
+
                         <div class="form-group">
+
 
                             <label for="location">
                                 Location
                             </label>
+
 
                             <input
                                 type="text"
@@ -237,61 +431,99 @@
                                 placeholder="Example: AUP Chapel"
                                 required>
 
+
                         </div>
 
 
+
+                        <!-- DESCRIPTION -->
+
                         <div class="form-group">
+
 
                             <label for="description">
                                 Description
                             </label>
+
 
                             <input
                                 type="text"
                                 id="description"
                                 placeholder="Optional description">
 
+
                         </div>
 
+
+
+                        <!-- SAVE -->
 
                         <button
                             type="submit"
                             class="primary-button">
+
                             Save Schedule
+
                         </button>
 
+
+
+                        <!-- CANCEL -->
 
                         <button
                             type="button"
                             class="primary-button"
                             id="cancelScheduleBtn"
                             style="margin-left: 10px;">
+
                             Cancel
+
                         </button>
+
 
                     </form>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
 
+
     </main>
+
 
 </div>
 
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- =========================================
+     SUPABASE
+     ========================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
 
 
-<!-- LOGIN SCRIPT -->
+
+<!-- =========================================
+     AUTHENTICATION
+     ========================================= -->
+
 <script src="script.js"></script>
 
 
-<!-- SCHEDULE SCRIPT -->
+
+<!-- =========================================
+     SCHEDULE SCRIPT
+     ========================================= -->
+
 <script src="schedules.js"></script>
+
 
 </body>
 
