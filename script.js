@@ -8,55 +8,130 @@ const supabaseClient = window.supabase.createClient(
 
 console.log("NEW SCRIPT LOADED");
 
+
 const loginForm = document.querySelector("form");
 
+
 if (loginForm) {
+
     loginForm.addEventListener("submit", async function (event) {
+
         event.preventDefault();
 
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
+
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+
+
+        if (!emailInput || !passwordInput) {
+            console.error("Login fields were not found.");
+            return;
+        }
+
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
 
         if (!email || !password) {
+
             alert("Please enter your email and password.");
+
             return;
         }
 
-        const { data, error } =
-            await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+
+        /* LOGIN */
+
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.signInWithPassword({
+
+            email: email,
+            password: password
+
+        });
+
 
         if (error) {
+
             alert("Login failed: " + error.message);
-            console.error(error);
+
+            console.error("Login error:", error);
+
             return;
         }
+
 
         const user = data.user;
 
-        const { data: profile, error: profileError } =
-            await supabaseClient
-                .from("profiles")
-                .select("full_name, role")
-                .eq("id", user.id)
-                .single();
 
-        if (profileError) {
-            alert("Login worked, but your profile could not be found.");
-            console.error(profileError);
+        if (!user) {
+
+            alert("Login failed. User account was not found.");
+
             return;
         }
 
+
+        /* GET PROFILE */
+
+        const {
+            data: profile,
+            error: profileError
+        } = await supabaseClient
+
+            .from("profiles")
+
+            .select("full_name, role")
+
+            .eq("id", user.id)
+
+            .single();
+
+
+        if (profileError) {
+
+            alert(
+                "Login worked, but your profile could not be found."
+            );
+
+            console.error(
+                "Profile error:",
+                profileError
+            );
+
+            return;
+        }
+
+
         console.log("Logged in user:", profile);
 
+
+        /* REDIRECT BASED ON ROLE */
+
         if (profile.role === "admin") {
+
             window.location.href = "admin.html";
-        } else if (profile.role === "personnel") {
-            window.location.href = "personnel.html";
-        } else {
-            alert("Your account does not have a valid role.");
+
         }
+
+        else if (profile.role === "personnel") {
+
+            window.location.href =
+                "personnel-dashboard.html";
+
+        }
+
+        else {
+
+            alert(
+                "Your account does not have a valid role."
+            );
+
+        }
+
     });
+
 }
