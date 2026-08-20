@@ -1,6 +1,5 @@
 console.log("CALENDAR SCRIPT LOADED");
 
-
 const currentMonthElement =
     document.getElementById("currentMonth");
 
@@ -16,20 +15,18 @@ const nextMonthBtn =
 const todayBtn =
     document.getElementById("todayBtn");
 
-
 let currentDate = new Date();
 
 
-/* ==========================================
-   LOAD CALENDAR
-   ========================================== */
+// ==========================================
+// LOAD CALENDAR
+// ==========================================
 
 async function loadCalendar() {
 
     if (!calendarDays) {
         return;
     }
-
 
     const {
         data: schedules,
@@ -41,7 +38,6 @@ async function loadCalendar() {
             ascending: true
         });
 
-
     if (error) {
 
         console.error(
@@ -49,29 +45,11 @@ async function loadCalendar() {
             error
         );
 
-        calendarDays.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    ⚠️
-                </div>
-
-                <h3>
-                    Could not load schedules
-                </h3>
-
-                <p>
-                    ${error.message}
-                </p>
-
-            </div>
-        `;
-
         return;
     }
 
 
-    /* GET PERSONNEL */
+    // GET PERSONNEL
 
     const {
         data: personnel,
@@ -80,7 +58,6 @@ async function loadCalendar() {
         .from("profiles")
         .select("id, full_name")
         .eq("role", "personnel");
-
 
     if (personnelError) {
 
@@ -93,7 +70,7 @@ async function loadCalendar() {
     }
 
 
-    /* GET ASSIGNMENTS */
+    // GET ASSIGNMENTS
 
     const {
         data: assignments,
@@ -101,7 +78,6 @@ async function loadCalendar() {
     } = await supabaseClient
         .from("assignments")
         .select("schedule_id, personnel_id");
-
 
     if (assignmentError) {
 
@@ -119,13 +95,12 @@ async function loadCalendar() {
         personnel,
         assignments
     );
-
 }
 
 
-/* ==========================================
-   RENDER CALENDAR
-   ========================================== */
+// ==========================================
+// RENDER CALENDAR
+// ==========================================
 
 function renderCalendar(
     schedules,
@@ -135,7 +110,6 @@ function renderCalendar(
 
     calendarDays.innerHTML = "";
 
-
     const year =
         currentDate.getFullYear();
 
@@ -143,7 +117,7 @@ function renderCalendar(
         currentDate.getMonth();
 
 
-    const monthName =
+    currentMonthElement.textContent =
         currentDate.toLocaleString(
             "default",
             {
@@ -153,12 +127,6 @@ function renderCalendar(
         );
 
 
-    currentMonthElement.textContent =
-        monthName;
-
-
-    /* FIRST DAY */
-
     const firstDay =
         new Date(
             year,
@@ -166,12 +134,9 @@ function renderCalendar(
             1
         );
 
-
     const firstDayOfWeek =
         firstDay.getDay();
 
-
-    /* DAYS IN MONTH */
 
     const daysInMonth =
         new Date(
@@ -181,8 +146,6 @@ function renderCalendar(
         ).getDate();
 
 
-    /* DAYS FROM PREVIOUS MONTH */
-
     const daysInPreviousMonth =
         new Date(
             year,
@@ -191,7 +154,7 @@ function renderCalendar(
         ).getDate();
 
 
-    /* PREVIOUS MONTH DAYS */
+    // PREVIOUS MONTH DAYS
 
     for (
         let i = firstDayOfWeek - 1;
@@ -202,20 +165,17 @@ function renderCalendar(
         const dayNumber =
             daysInPreviousMonth - i;
 
-
         const day =
             createCalendarDay(
                 dayNumber,
                 true
             );
 
-
         calendarDays.appendChild(day);
-
     }
 
 
-    /* CURRENT MONTH */
+    // CURRENT MONTH DAYS
 
     for (
         let dayNumber = 1;
@@ -234,8 +194,6 @@ function renderCalendar(
             `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
 
 
-        /* FIND EVENTS */
-
         const daySchedules =
             schedules.filter(function (schedule) {
 
@@ -245,7 +203,7 @@ function renderCalendar(
             });
 
 
-        /* ADD EVENTS */
+        // ADD EVENTS
 
         daySchedules.forEach(function (schedule) {
 
@@ -273,7 +231,6 @@ function renderCalendar(
                                     assignment.personnel_id;
 
                             });
-
 
                         return person
                             ? person.full_name
@@ -304,11 +261,24 @@ function renderCalendar(
                     ${escapeHTML(schedule.location)}
                 </small>
 
-                <small>
-                    👤 ${escapeHTML(personnelText)}
-                </small>
-
             `;
+
+
+            // ==================================
+            // CLICK EVENT
+            // ==================================
+
+            event.addEventListener(
+                "click",
+                function () {
+
+                    showScheduleDetails(
+                        schedule,
+                        personnelText
+                    );
+
+                }
+            );
 
 
             day.appendChild(event);
@@ -321,7 +291,7 @@ function renderCalendar(
     }
 
 
-    /* NEXT MONTH DAYS */
+    // NEXT MONTH DAYS
 
     const totalCells =
         firstDayOfWeek +
@@ -346,17 +316,15 @@ function renderCalendar(
                 true
             );
 
-
         calendarDays.appendChild(day);
-
     }
 
 }
 
 
-/* ==========================================
-   CREATE DAY
-   ========================================== */
+// ==========================================
+// CREATE CALENDAR DAY
+// ==========================================
 
 function createCalendarDay(
     number,
@@ -365,7 +333,6 @@ function createCalendarDay(
 
     const day =
         document.createElement("div");
-
 
     day.className =
         "calendar-day";
@@ -383,10 +350,8 @@ function createCalendarDay(
     const numberElement =
         document.createElement("div");
 
-
     numberElement.className =
         "calendar-number";
-
 
     numberElement.textContent =
         number;
@@ -398,13 +363,222 @@ function createCalendarDay(
 
 
     return day;
+}
+
+
+// ==========================================
+// SHOW SCHEDULE DETAILS
+// ==========================================
+
+function showScheduleDetails(
+    schedule,
+    personnelText
+) {
+
+    // Remove existing modal
+
+    const existingModal =
+        document.getElementById(
+            "scheduleDetailsModal"
+        );
+
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "scheduleDetailsModal";
+
+
+    modal.innerHTML = `
+
+        <div class="schedule-modal-overlay">
+
+            <div class="schedule-modal">
+
+                <button
+                    type="button"
+                    class="schedule-modal-close"
+                    id="closeScheduleModal">
+                    ×
+                </button>
+
+
+                <h2>
+                    ${escapeHTML(schedule.title)}
+                </h2>
+
+
+                <div class="schedule-detail">
+
+                    <strong>
+                        📅 Date
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(schedule.event_date)}
+                    </span>
+
+                </div>
+
+
+                <div class="schedule-detail">
+
+                    <strong>
+                        ⏰ Time
+                    </strong>
+
+                    <span>
+                        ${formatTime(schedule.start_time)}
+                        -
+                        ${formatTime(schedule.end_time)}
+                    </span>
+
+                </div>
+
+
+                <div class="schedule-detail">
+
+                    <strong>
+                        📍 Location
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(schedule.location)}
+                    </span>
+
+                </div>
+
+
+                <div class="schedule-detail">
+
+                    <strong>
+                        👤 Personnel
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(personnelText)}
+                    </span>
+
+                </div>
+
+
+                <div class="schedule-detail">
+
+                    <strong>
+                        📝 Description
+                    </strong>
+
+                    <span>
+                        ${
+                            escapeHTML(
+                                schedule.description ||
+                                "No description"
+                            )
+                        }
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="closeScheduleModalButton">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    // Close with X
+
+    document
+        .getElementById(
+            "closeScheduleModal"
+        )
+        .addEventListener(
+            "click",
+            closeScheduleDetails
+        );
+
+
+    // Close with button
+
+    document
+        .getElementById(
+            "closeScheduleModalButton"
+        )
+        .addEventListener(
+            "click",
+            closeScheduleDetails
+        );
+
+
+    // Close by clicking outside
+
+    document
+        .querySelector(
+            ".schedule-modal-overlay"
+        )
+        .addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target.classList.contains(
+                        "schedule-modal-overlay"
+                    )
+                ) {
+
+                    closeScheduleDetails();
+
+                }
+
+            }
+        );
 
 }
 
 
-/* ==========================================
-   FORMAT TIME
-   ========================================== */
+// ==========================================
+// CLOSE MODAL
+// ==========================================
+
+function closeScheduleDetails() {
+
+    const modal =
+        document.getElementById(
+            "scheduleDetailsModal"
+        );
+
+    if (modal) {
+
+        modal.remove();
+
+    }
+
+}
+
+
+// ==========================================
+// FORMAT TIME
+// ==========================================
 
 function formatTime(time) {
 
@@ -444,13 +618,12 @@ function formatTime(time) {
 
 
     return `${hour}:${minute} ${period}`;
-
 }
 
 
-/* ==========================================
-   HTML SAFETY
-   ========================================== */
+// ==========================================
+// HTML SAFETY
+// ==========================================
 
 function escapeHTML(value) {
 
@@ -470,13 +643,12 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
 
-/* ==========================================
-   BUTTONS
-   ========================================== */
+// ==========================================
+// MONTH BUTTONS
+// ==========================================
 
 if (previousMonthBtn) {
 
@@ -531,8 +703,8 @@ if (todayBtn) {
 }
 
 
-/* ==========================================
-   START
-   ========================================== */
+// ==========================================
+// START
+// ==========================================
 
 loadCalendar();
