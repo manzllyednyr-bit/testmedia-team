@@ -8,32 +8,53 @@ const supabaseClient = window.supabase.createClient(
 
 const loginForm = document.querySelector("form");
 
-loginForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
+if (loginForm) {
+    loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
 
-    if (!email || !password) {
-        alert("Please enter your email and password.");
-        return;
-    }
+        if (!email || !password) {
+            alert("Please enter your email and password.");
+            return;
+        }
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+        if (error) {
+            alert("Login failed: " + error.message);
+            console.error(error);
+            return;
+        }
+
+        const user = data.user;
+
+        const { data: profile, error: profileError } =
+            await supabaseClient
+                .from("profiles")
+                .select("full_name, role")
+                .eq("id", user.id)
+                .single();
+
+        if (profileError) {
+            alert("Login worked, but your profile could not be found.");
+            console.error(profileError);
+            return;
+        }
+
+        console.log("Logged in user:", profile);
+        
+        if (profile.role === "admin") {
+            window.location.href = "admin.html";
+        } else if (profile.role === "personnel") {
+            window.location.href = "personnel.html";
+        } else {
+            alert("Your account does not have a valid role.");
+        }
     });
-
-    if (error) {
-        alert("Login failed: " + error.message);
-        return;
-    }
-
-     if (profile.role === "admin") {
-        window.location.href = "admin.html";
-    } else if (profile.role === "personnel") {
-        window.location.href = "personnel.html";
-    } else {
-        alert("Your account does not have a valid role.");
-    }
-});
+}
