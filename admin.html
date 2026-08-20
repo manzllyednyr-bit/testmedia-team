@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - Media Team</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <div class="logo">MT</div>
+
+                <div>
+                    <h2>Media Team</h2>
+                    <p>Scheduling System</p>
+                </div>
+            </div>
+
+            <nav class="navigation">
+
+                <a href="#" class="nav-item active">
+                    Dashboard
+                </a>
+
+                <a href="#" class="nav-item">
+                    Schedules
+                </a>
+
+                <a href="#" class="nav-item">
+                    Calendar
+                </a>
+
+                <a href="#" class="nav-item">
+                    Personnel
+                </a>
+
+                <a href="#" class="nav-item">
+                    Reports
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <a href="#" class="nav-item">
+                    Settings
+                </a>
+
+                <a href="index.html" class="nav-item">
+                    Logout
+                </a>
+
+            </div>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <header class="dashboard-header">
+
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, Admin.</p>
+                </div>
+
+                <div class="admin-profile">
+                    <div class="profile-circle">
+                        A
+                    </div>
+
+                    <div>
+                        <strong>Admin</strong>
+                        <small>Media Director</small>
+                    </div>
+                </div>
+
+            </header>
+
+
+            <!-- Statistics -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📅
+                    </div>
+
+                    <div>
+                        <p>Total Schedules</p>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        👥
+                    </div>
+
+                    <div>
+                        <p>Total Personnel</p>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ⏱
+                    </div>
+
+                    <div>
+                        <p>Assigned Hours</p>
+                        <h2>0 hrs</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📋
+                    </div>
+
+                    <div>
+                        <p>Upcoming</p>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Upcoming Schedules -->
+            <section class="dashboard-section">
+
+                <div class="section-header">
+
+                    <div>
+                        <h2>Upcoming Schedules</h2>
+                        <p>Recently scheduled media duties</p>
+                    </div>
+
+                    <button class="primary-button">
+                        + Create Schedule
+                    </button>
+
+                </div>
+
+
+                <div class="schedule-table">
+
+                    <div class="table-header">
+
+                        <span>Event</span>
+                        <span>Date</span>
+                        <span>Time</span>
+                        <span>Location</span>
+                        <span>Personnel</span>
+
+                    </div>
+
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            📅
+                        </div>
+
+                        <h3>No schedules yet</h3>
+
+                        <p>
+                            Create your first media schedule to get started.
+                        </p>
+
+                        <button class="primary-button">
+                            Create Schedule
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>
