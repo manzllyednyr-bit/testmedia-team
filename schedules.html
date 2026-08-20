@@ -76,6 +76,87 @@
             transform: rotate(180deg);
         }
 
+
+        /* =========================================
+           TRACKER FORM
+           ========================================= */
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .tracker-full {
+            grid-column: 1 / -1;
+        }
+
+        .hours-display {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 7px;
+            padding: 11px 12px;
+            color: #123f6d;
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           TRACKER TABLE
+           ========================================= */
+
+        .tracker-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .tracker-table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+        }
+
+        .tracker-table th,
+        .tracker-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        .tracker-table th {
+            background: #f8fafc;
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .tracker-table td {
+            font-size: 13px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f2f4f7;
+            color: #344054;
+        }
+
+
+        @media (max-width: 800px) {
+
+            .tracker-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tracker-full {
+                grid-column: auto;
+            }
+
+        }
+
     </style>
 
 </head>
@@ -244,10 +325,11 @@
 
 
         <!-- =========================================
-             CREATE SCHEDULE
+             CREATE SCHEDULE / TRACKER
              ========================================= -->
 
-        <section class="dashboard-section collapsible-section">
+        <section
+            class="dashboard-section collapsible-section">
 
 
             <div class="collapsible-header">
@@ -260,7 +342,7 @@
                     </h2>
 
                     <p>
-                        Add a new media team schedule.
+                        Add a new media team schedule and tracker information.
                     </p>
 
                 </div>
@@ -274,8 +356,7 @@
                     Show
 
                     <span
-                        class="collapse-arrow"
-                        id="createArrow">
+                        class="collapse-arrow">
 
                         ▼
 
@@ -298,105 +379,219 @@
                 <form id="scheduleForm">
 
 
-                    <!-- EVENT NAME -->
-
-                    <div class="form-group">
-
-                        <label for="eventName">
-                            Event Name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="eventName"
-                            placeholder="Example: Sunday Worship Service"
-                            required>
-
-                    </div>
+                    <div class="tracker-grid">
 
 
+                        <!-- EVENT NAME -->
 
-                    <!-- DATE -->
+                        <div class="form-group">
 
-                    <div class="form-group">
+                            <label for="eventName">
+                                Event Name
+                            </label>
 
-                        <label for="scheduleDate">
-                            Date
-                        </label>
+                            <input
+                                type="text"
+                                id="eventName"
+                                placeholder="Example: Sunday Worship Service"
+                                required>
 
-                        <input
-                            type="date"
-                            id="scheduleDate"
-                            required>
-
-                    </div>
+                        </div>
 
 
 
-                    <!-- START TIME -->
+                        <!-- DATE -->
 
-                    <div class="form-group">
+                        <div class="form-group">
 
-                        <label for="startTime">
-                            Start Time
-                        </label>
+                            <label for="scheduleDate">
+                                Date
+                            </label>
 
-                        <input
-                            type="time"
-                            id="startTime"
-                            required>
+                            <input
+                                type="date"
+                                id="scheduleDate"
+                                required>
 
-                    </div>
-
-
-
-                    <!-- END TIME -->
-
-                    <div class="form-group">
-
-                        <label for="endTime">
-                            End Time
-                        </label>
-
-                        <input
-                            type="time"
-                            id="endTime"
-                            required>
-
-                    </div>
+                        </div>
 
 
 
-                    <!-- LOCATION -->
+                        <!-- START TIME -->
 
-                    <div class="form-group">
+                        <div class="form-group">
 
-                        <label for="location">
-                            Location
-                        </label>
+                            <label for="startTime">
+                                Start Time
+                            </label>
 
-                        <input
-                            type="text"
-                            id="location"
-                            placeholder="Example: AUP Chapel"
-                            required>
+                            <input
+                                type="time"
+                                id="startTime"
+                                required>
 
-                    </div>
-
+                        </div>
 
 
-                    <!-- DESCRIPTION -->
 
-                    <div class="form-group">
+                        <!-- END TIME -->
 
-                        <label for="description">
-                            Description
-                        </label>
+                        <div class="form-group">
 
-                        <input
-                            type="text"
-                            id="description"
-                            placeholder="Optional description">
+                            <label for="endTime">
+                                End Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="endTime"
+                                required>
+
+                        </div>
+
+
+
+                        <!-- HOURS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Assigned Hours
+                            </label>
+
+                            <div
+                                id="hoursDisplay"
+                                class="hours-display">
+
+                                0 hrs
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- LOCATION -->
+
+                        <div class="form-group">
+
+                            <label for="location">
+                                Location
+                            </label>
+
+                            <input
+                                type="text"
+                                id="location"
+                                placeholder="Example: AUP Chapel"
+                                required>
+
+                        </div>
+
+
+
+                        <!-- EQUIPMENT -->
+
+                        <div class="form-group">
+
+                            <label for="equipment">
+                                Equipment
+                            </label>
+
+                            <input
+                                type="text"
+                                id="equipment"
+                                placeholder="Example: Camera, Tripod, Microphone">
+
+                        </div>
+
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label for="status">
+                                Status
+                            </label>
+
+                            <select id="status">
+
+                                <option value="Pending/Sorting">
+                                    Pending/Sorting
+                                </option>
+
+                                <option value="In Progress">
+                                    In Progress
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                                <option value="Cancelled">
+                                    Cancelled
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- COLORGRADER -->
+
+                        <div class="form-group">
+
+                            <label for="colorgrader">
+                                Colorgrader
+                            </label>
+
+                            <select id="colorgrader">
+
+                                <option value="">
+                                    Select Colorgrader
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- REMARKS -->
+
+                        <div
+                            class="form-group tracker-full">
+
+                            <label for="remarks">
+                                Remarks
+                            </label>
+
+                            <textarea
+                                id="remarks"
+                                rows="3"
+                                placeholder="Additional notes or instructions"></textarea>
+
+                        </div>
+
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div
+                            class="form-group tracker-full">
+
+                            <label for="description">
+                                Description
+                            </label>
+
+                            <textarea
+                                id="description"
+                                rows="3"
+                                placeholder="Optional description"></textarea>
+
+                        </div>
+
 
                     </div>
 
@@ -404,24 +599,35 @@
 
                     <!-- BUTTONS -->
 
-                    <button
-                        type="submit"
-                        class="primary-button">
-
-                        Save Schedule
-
-                    </button>
+                    <div
+                        style="
+                            margin-top: 20px;
+                        ">
 
 
-                    <button
-                        type="button"
-                        class="primary-button"
-                        id="cancelScheduleBtn"
-                        style="margin-left: 10px;">
+                        <button
+                            type="submit"
+                            class="primary-button">
 
-                        Cancel
+                            Save Schedule
 
-                    </button>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="primary-button"
+                            id="cancelScheduleBtn"
+                            style="
+                                margin-left: 10px;
+                            ">
+
+                            Cancel
+
+                        </button>
+
+
+                    </div>
 
 
                 </form>
@@ -435,10 +641,11 @@
 
 
         <!-- =========================================
-             ALL SCHEDULES
+             ALL SCHEDULES / TRACKER
              ========================================= -->
 
-        <section class="dashboard-section collapsible-section">
+        <section
+            class="dashboard-section collapsible-section">
 
 
             <div class="collapsible-header">
@@ -451,7 +658,7 @@
                     </h2>
 
                     <p>
-                        View and manage scheduled media duties.
+                        View and track scheduled media duties.
                     </p>
 
                 </div>
@@ -465,8 +672,7 @@
                     Show
 
                     <span
-                        class="collapse-arrow"
-                        id="schedulesArrow">
+                        class="collapse-arrow">
 
                         ▼
 
@@ -479,77 +685,112 @@
 
 
 
-            <!-- SCHEDULE CONTENT -->
+            <!-- TRACKER CONTENT -->
 
             <div
                 id="schedulesContent"
                 class="collapsible-content">
 
 
-                <div class="schedule-table">
+                <div
+                    class="tracker-table-wrapper">
 
 
-                    <div class="table-header">
-
-                        <div>
-                            Event
-                        </div>
-
-                        <div>
-                            Date
-                        </div>
-
-                        <div>
-                            Time
-                        </div>
-
-                        <div>
-                            Location
-                        </div>
-
-                        <div>
-                            Personnel
-                        </div>
-
-                    </div>
+                    <table
+                        class="tracker-table">
 
 
-                    <div id="scheduleList">
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Event
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                                <th>
+                                    Hours
+                                </th>
+
+                                <th>
+                                    Media
+                                </th>
+
+                                <th>
+                                    Equipment
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Colorgrader
+                                </th>
+
+                                <th>
+                                    Remarks
+                                </th>
+
+                            </tr>
+
+                        </thead>
 
 
-                        <div class="empty-state">
+                        <tbody id="scheduleList">
 
 
-                            <div class="empty-icon">
-                                📅
-                            </div>
+                            <tr>
+
+                                <td
+                                    colspan="9"
+                                    style="
+                                        text-align: center;
+                                        padding: 40px;
+                                    ">
+
+                                    <div class="empty-state">
+
+                                        <div class="empty-icon">
+                                            📅
+                                        </div>
+
+                                        <h3>
+                                            No schedules yet
+                                        </h3>
+
+                                        <p>
+                                            Create your first media schedule to get started.
+                                        </p>
+
+                                        <button
+                                            type="button"
+                                            class="primary-button"
+                                            id="createScheduleEmptyBtn">
+
+                                            Create Schedule
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
 
 
-                            <h3>
-                                No schedules yet
-                            </h3>
+                        </tbody>
 
 
-                            <p>
-                                Create your first media schedule
-                                to get started.
-                            </p>
-
-
-                            <button
-                                type="button"
-                                class="primary-button"
-                                id="createScheduleEmptyBtn">
-
-                                Create Schedule
-
-                            </button>
-
-
-                        </div>
-
-
-                    </div>
+                    </table>
 
 
                 </div>
@@ -682,7 +923,7 @@
 
 
     /* =========================================
-       CREATE BUTTON FROM EMPTY STATE
+       EMPTY STATE CREATE BUTTON
        ========================================= */
 
     document.addEventListener(
@@ -713,6 +954,139 @@
 
         }
     );
+
+
+
+    /* =========================================
+       CALCULATE HOURS
+       ========================================= */
+
+    const startTimeInput =
+        document.getElementById(
+            "startTime"
+        );
+
+
+    const endTimeInput =
+        document.getElementById(
+            "endTime"
+        );
+
+
+    const hoursDisplay =
+        document.getElementById(
+            "hoursDisplay"
+        );
+
+
+    function updateHoursDisplay() {
+
+        if (
+            !startTimeInput ||
+            !endTimeInput ||
+            !hoursDisplay
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !startTimeInput.value ||
+            !endTimeInput.value
+        ) {
+
+            hoursDisplay.textContent =
+                "0 hrs";
+
+            return;
+
+        }
+
+
+        const startParts =
+            startTimeInput.value
+                .split(":");
+
+
+        const endParts =
+            endTimeInput.value
+                .split(":");
+
+
+        const startMinutes =
+            (
+                parseInt(
+                    startParts[0],
+                    10
+                ) * 60
+            ) +
+            parseInt(
+                startParts[1],
+                10
+            );
+
+
+        const endMinutes =
+            (
+                parseInt(
+                    endParts[0],
+                    10
+                ) * 60
+            ) +
+            parseInt(
+                endParts[1],
+                10
+            );
+
+
+        const difference =
+            endMinutes -
+            startMinutes;
+
+
+        if (difference <= 0) {
+
+            hoursDisplay.textContent =
+                "0 hrs";
+
+            return;
+
+        }
+
+
+        const hours =
+            difference / 60;
+
+
+        hoursDisplay.textContent =
+            `${hours % 1 === 0
+                ? hours
+                : hours.toFixed(2)
+            } hrs`;
+
+    }
+
+
+    if (startTimeInput) {
+
+        startTimeInput.addEventListener(
+            "change",
+            updateHoursDisplay
+        );
+
+    }
+
+
+    if (endTimeInput) {
+
+        endTimeInput.addEventListener(
+            "change",
+            updateHoursDisplay
+        );
+
+    }
 
 
 </script>
