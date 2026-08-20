@@ -2,26 +2,19 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Schedules - Media Team
-    </title>
+    <title>Schedules - Media Team</title>
 
     <link
         rel="stylesheet"
         href="style.css">
 
     <style>
-
-        /* =========================================
-           COLLAPSIBLE SECTIONS
-           ========================================= */
 
         .collapsible-section {
             margin-bottom: 20px;
@@ -76,34 +69,7 @@
             transform: rotate(180deg);
         }
 
-
-        /* =========================================
-           TRACKER FORM
-           ========================================= */
-
-        .tracker-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-        }
-
-        .tracker-full {
-            grid-column: 1 / -1;
-        }
-
-        .hours-display {
-            background: #f8fafc;
-            border: 1px solid #e5e7eb;
-            border-radius: 7px;
-            padding: 11px 12px;
-            color: #123f6d;
-            font-weight: 600;
-        }
-
-
-        /* =========================================
-           TRACKER TABLE
-           ========================================= */
+        /* TRACKER */
 
         .tracker-table-wrapper {
             width: 100%;
@@ -119,8 +85,8 @@
         .tracker-table th,
         .tracker-table td {
             padding: 12px;
-            text-align: left;
             border-bottom: 1px solid #e5e7eb;
+            text-align: left;
             vertical-align: top;
         }
 
@@ -138,21 +104,25 @@
             display: inline-block;
             padding: 5px 9px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
             background: #f2f4f7;
             color: #344054;
+            font-size: 12px;
+            font-weight: 600;
         }
 
+        .tracker-empty {
+            text-align: center;
+            padding: 40px !important;
+        }
 
         @media (max-width: 800px) {
 
-            .tracker-grid {
-                grid-template-columns: 1fr;
+            .collapsible-header {
+                gap: 15px;
             }
 
-            .tracker-full {
-                grid-column: auto;
+            .collapsible-header h2 {
+                font-size: 18px;
             }
 
         }
@@ -174,33 +144,24 @@
 
     <aside class="sidebar">
 
-
         <div class="sidebar-logo">
 
             <div class="logo">
                 MT
             </div>
 
-
             <div>
 
-                <h2>
-                    Media Team
-                </h2>
+                <h2>Media Team</h2>
 
-                <p>
-                    Scheduling System
-                </p>
+                <p>Scheduling System</p>
 
             </div>
 
         </div>
 
 
-        <!-- NAVIGATION -->
-
         <nav class="navigation">
-
 
             <a
                 href="admin.html"
@@ -237,14 +198,10 @@
 
             </a>
 
-
         </nav>
 
 
-        <!-- SIDEBAR BOTTOM -->
-
         <div class="sidebar-bottom">
-
 
             <a
                 href="#"
@@ -263,9 +220,7 @@
 
             </a>
 
-
         </div>
-
 
     </aside>
 
@@ -278,10 +233,7 @@
     <main class="main-content">
 
 
-        <!-- HEADER -->
-
         <header class="dashboard-header">
-
 
             <div>
 
@@ -298,11 +250,9 @@
 
             <div class="admin-profile">
 
-
                 <div class="profile-circle">
                     A
                 </div>
-
 
                 <div>
 
@@ -316,16 +266,14 @@
 
                 </div>
 
-
             </div>
-
 
         </header>
 
 
 
         <!-- =========================================
-             CREATE SCHEDULE / TRACKER
+             1. CREATE SCHEDULE
              ========================================= -->
 
         <section
@@ -334,7 +282,6 @@
 
             <div class="collapsible-header">
 
-
                 <div>
 
                     <h2>
@@ -342,7 +289,7 @@
                     </h2>
 
                     <p>
-                        Add a new media team schedule and tracker information.
+                        Create a new media team schedule.
                     </p>
 
                 </div>
@@ -354,22 +301,14 @@
                     id="toggleCreateBtn">
 
                     Show
-
-                    <span
-                        class="collapse-arrow">
-
+                    <span class="collapse-arrow">
                         ▼
-
                     </span>
 
                 </button>
 
-
             </div>
 
-
-
-            <!-- CREATE FORM -->
 
             <div
                 id="createScheduleContent"
@@ -379,255 +318,110 @@
                 <form id="scheduleForm">
 
 
-                    <div class="tracker-grid">
-
-
-                        <!-- EVENT NAME -->
-
-                        <div class="form-group">
-
-                            <label for="eventName">
-                                Event Name
-                            </label>
-
-                            <input
-                                type="text"
-                                id="eventName"
-                                placeholder="Example: Sunday Worship Service"
-                                required>
-
-                        </div>
-
-
-
-                        <!-- DATE -->
-
-                        <div class="form-group">
-
-                            <label for="scheduleDate">
-                                Date
-                            </label>
-
-                            <input
-                                type="date"
-                                id="scheduleDate"
-                                required>
-
-                        </div>
-
-
-
-                        <!-- START TIME -->
-
-                        <div class="form-group">
-
-                            <label for="startTime">
-                                Start Time
-                            </label>
-
-                            <input
-                                type="time"
-                                id="startTime"
-                                required>
-
-                        </div>
-
-
-
-                        <!-- END TIME -->
-
-                        <div class="form-group">
-
-                            <label for="endTime">
-                                End Time
-                            </label>
-
-                            <input
-                                type="time"
-                                id="endTime"
-                                required>
-
-                        </div>
-
-
-
-                        <!-- HOURS -->
-
-                        <div class="form-group">
-
-                            <label>
-                                Assigned Hours
-                            </label>
-
-                            <div
-                                id="hoursDisplay"
-                                class="hours-display">
-
-                                0 hrs
-
-                            </div>
-
-                        </div>
-
-
-
-                        <!-- LOCATION -->
-
-                        <div class="form-group">
-
-                            <label for="location">
-                                Location
-                            </label>
-
-                            <input
-                                type="text"
-                                id="location"
-                                placeholder="Example: AUP Chapel"
-                                required>
-
-                        </div>
-
-
-
-                        <!-- EQUIPMENT -->
-
-                        <div class="form-group">
-
-                            <label for="equipment">
-                                Equipment
-                            </label>
-
-                            <input
-                                type="text"
-                                id="equipment"
-                                placeholder="Example: Camera, Tripod, Microphone">
-
-                        </div>
-
-
-
-                        <!-- STATUS -->
-
-                        <div class="form-group">
-
-                            <label for="status">
-                                Status
-                            </label>
-
-                            <select id="status">
-
-                                <option value="Pending/Sorting">
-                                    Pending/Sorting
-                                </option>
-
-                                <option value="In Progress">
-                                    In Progress
-                                </option>
-
-                                <option value="Completed">
-                                    Completed
-                                </option>
-
-                                <option value="Cancelled">
-                                    Cancelled
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-
-                        <!-- COLORGRADER -->
-
-                        <div class="form-group">
-
-                            <label for="colorgrader">
-                                Colorgrader
-                            </label>
-
-                            <select id="colorgrader">
-
-                                <option value="">
-                                    Select Colorgrader
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-
-                        <!-- REMARKS -->
-
-                        <div
-                            class="form-group tracker-full">
-
-                            <label for="remarks">
-                                Remarks
-                            </label>
-
-                            <textarea
-                                id="remarks"
-                                rows="3"
-                                placeholder="Additional notes or instructions"></textarea>
-
-                        </div>
-
-
-
-                        <!-- DESCRIPTION -->
-
-                        <div
-                            class="form-group tracker-full">
-
-                            <label for="description">
-                                Description
-                            </label>
-
-                            <textarea
-                                id="description"
-                                rows="3"
-                                placeholder="Optional description"></textarea>
-
-                        </div>
-
+                    <div class="form-group">
+
+                        <label for="eventName">
+                            Event Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="eventName"
+                            placeholder="Example: Sunday Worship Service"
+                            required>
 
                     </div>
 
 
+                    <div class="form-group">
 
-                    <!-- BUTTONS -->
+                        <label for="scheduleDate">
+                            Date
+                        </label>
 
-                    <div
-                        style="
-                            margin-top: 20px;
-                        ">
-
-
-                        <button
-                            type="submit"
-                            class="primary-button">
-
-                            Save Schedule
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            id="cancelScheduleBtn"
-                            style="
-                                margin-left: 10px;
-                            ">
-
-                            Cancel
-
-                        </button>
-
+                        <input
+                            type="date"
+                            id="scheduleDate"
+                            required>
 
                     </div>
+
+
+                    <div class="form-group">
+
+                        <label for="startTime">
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="startTime"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="endTime">
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="endTime"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="location">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            placeholder="Example: AUP Chapel"
+                            required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            rows="3"
+                            placeholder="Optional description"></textarea>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="primary-button">
+
+                        Save Schedule
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="cancelScheduleBtn"
+                        style="margin-left: 10px;">
+
+                        Cancel
+
+                    </button>
 
 
                 </form>
@@ -635,13 +429,12 @@
 
             </div>
 
-
         </section>
 
 
 
         <!-- =========================================
-             ALL SCHEDULES / TRACKER
+             2. ALL SCHEDULES
              ========================================= -->
 
         <section
@@ -650,7 +443,6 @@
 
             <div class="collapsible-header">
 
-
                 <div>
 
                     <h2>
@@ -658,7 +450,7 @@
                     </h2>
 
                     <p>
-                        View and track scheduled media duties.
+                        View and manage created schedules.
                     </p>
 
                 </div>
@@ -670,34 +462,136 @@
                     id="toggleSchedulesBtn">
 
                     Show
-
-                    <span
-                        class="collapse-arrow">
-
+                    <span class="collapse-arrow">
                         ▼
-
                     </span>
 
                 </button>
 
-
             </div>
 
-
-
-            <!-- TRACKER CONTENT -->
 
             <div
                 id="schedulesContent"
                 class="collapsible-content">
 
 
-                <div
-                    class="tracker-table-wrapper">
+                <div class="schedule-table">
 
 
-                    <table
-                        class="tracker-table">
+                    <div class="table-header">
+
+                        <div>
+                            Event
+                        </div>
+
+                        <div>
+                            Date
+                        </div>
+
+                        <div>
+                            Time
+                        </div>
+
+                        <div>
+                            Location
+                        </div>
+
+                        <div>
+                            Personnel
+                        </div>
+
+                    </div>
+
+
+                    <div id="scheduleList">
+
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+                                📅
+                            </div>
+
+                            <h3>
+                                No schedules yet
+                            </h3>
+
+                            <p>
+                                Create your first media schedule to get started.
+                            </p>
+
+                            <button
+                                type="button"
+                                class="primary-button"
+                                id="createScheduleEmptyBtn">
+
+                                Create Schedule
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================================
+             3. SCHEDULE TRACKER
+             ========================================= -->
+
+        <section
+            class="dashboard-section collapsible-section">
+
+
+            <div class="collapsible-header">
+
+                <div>
+
+                    <h2>
+                        Schedule Tracker
+                    </h2>
+
+                    <p>
+                        Track media work, equipment, status, and post-production.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="collapse-button"
+                    id="toggleTrackerBtn">
+
+                    Show
+                    <span class="collapse-arrow">
+                        ▼
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="trackerContent"
+                class="collapsible-content">
+
+
+                <div class="tracker-table-wrapper">
+
+
+                    <table class="tracker-table">
 
 
                         <thead>
@@ -710,10 +604,6 @@
 
                                 <th>
                                     Event
-                                </th>
-
-                                <th>
-                                    Time
                                 </th>
 
                                 <th>
@@ -745,40 +635,28 @@
                         </thead>
 
 
-                        <tbody id="scheduleList">
+                        <tbody id="trackerList">
 
 
                             <tr>
 
                                 <td
-                                    colspan="9"
-                                    style="
-                                        text-align: center;
-                                        padding: 40px;
-                                    ">
+                                    colspan="8"
+                                    class="tracker-empty">
 
                                     <div class="empty-state">
 
                                         <div class="empty-icon">
-                                            📅
+                                            📊
                                         </div>
 
                                         <h3>
-                                            No schedules yet
+                                            No tracker records yet
                                         </h3>
 
                                         <p>
-                                            Create your first media schedule to get started.
+                                            Schedule tracker information will appear here.
                                         </p>
-
-                                        <button
-                                            type="button"
-                                            class="primary-button"
-                                            id="createScheduleEmptyBtn">
-
-                                            Create Schedule
-
-                                        </button>
 
                                     </div>
 
@@ -798,12 +676,10 @@
 
             </div>
 
-
         </section>
 
 
     </main>
-
 
 </div>
 
@@ -818,18 +694,8 @@
 </script>
 
 
-
-<!-- =========================================
-     AUTHENTICATION
-     ========================================= -->
-
 <script src="script.js"></script>
 
-
-
-<!-- =========================================
-     SCHEDULE SCRIPT
-     ========================================= -->
 
 <script src="schedules.js"></script>
 
@@ -842,35 +708,39 @@
 <script>
 
 
-    /* =========================================
-       CREATE SCHEDULE TOGGLE
-       ========================================= */
+    function setupCollapsible(
+        buttonId,
+        contentId
+    ) {
 
-    const toggleCreateBtn =
-        document.getElementById(
-            "toggleCreateBtn"
-        );
-
-
-    const createScheduleContent =
-        document.getElementById(
-            "createScheduleContent"
-        );
+        const button =
+            document.getElementById(
+                buttonId
+            );
 
 
-    if (toggleCreateBtn) {
+        const content =
+            document.getElementById(
+                contentId
+            );
 
-        toggleCreateBtn.addEventListener(
+
+        if (!button || !content) {
+            return;
+        }
+
+
+        button.addEventListener(
             "click",
             function () {
 
                 const isOpen =
-                    createScheduleContent.classList.toggle(
+                    content.classList.toggle(
                         "open"
                     );
 
 
-                toggleCreateBtn.innerHTML =
+                button.innerHTML =
                     isOpen
                         ? 'Hide <span class="collapse-arrow open">▼</span>'
                         : 'Show <span class="collapse-arrow">▼</span>';
@@ -881,45 +751,22 @@
     }
 
 
-
-    /* =========================================
-       ALL SCHEDULES TOGGLE
-       ========================================= */
-
-    const toggleSchedulesBtn =
-        document.getElementById(
-            "toggleSchedulesBtn"
-        );
+    setupCollapsible(
+        "toggleCreateBtn",
+        "createScheduleContent"
+    );
 
 
-    const schedulesContent =
-        document.getElementById(
-            "schedulesContent"
-        );
+    setupCollapsible(
+        "toggleSchedulesBtn",
+        "schedulesContent"
+    );
 
 
-    if (toggleSchedulesBtn) {
-
-        toggleSchedulesBtn.addEventListener(
-            "click",
-            function () {
-
-                const isOpen =
-                    schedulesContent.classList.toggle(
-                        "open"
-                    );
-
-
-                toggleSchedulesBtn.innerHTML =
-                    isOpen
-                        ? 'Hide <span class="collapse-arrow open">▼</span>'
-                        : 'Show <span class="collapse-arrow">▼</span>';
-
-            }
-        );
-
-    }
-
+    setupCollapsible(
+        "toggleTrackerBtn",
+        "trackerContent"
+    );
 
 
     /* =========================================
@@ -936,158 +783,48 @@
                     "createScheduleEmptyBtn"
             ) {
 
-                createScheduleContent.classList.add(
-                    "open"
-                );
+                const content =
+                    document.getElementById(
+                        "createScheduleContent"
+                    );
 
 
-                toggleCreateBtn.innerHTML =
-                    'Hide <span class="collapse-arrow open">▼</span>';
+                const button =
+                    document.getElementById(
+                        "toggleCreateBtn"
+                    );
 
 
-                createScheduleContent.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
+                if (content) {
+
+                    content.classList.add(
+                        "open"
+                    );
+
+                }
+
+
+                if (button) {
+
+                    button.innerHTML =
+                        'Hide <span class="collapse-arrow open">▼</span>';
+
+                }
+
+
+                if (content) {
+
+                    content.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                }
 
             }
 
         }
     );
-
-
-
-    /* =========================================
-       CALCULATE HOURS
-       ========================================= */
-
-    const startTimeInput =
-        document.getElementById(
-            "startTime"
-        );
-
-
-    const endTimeInput =
-        document.getElementById(
-            "endTime"
-        );
-
-
-    const hoursDisplay =
-        document.getElementById(
-            "hoursDisplay"
-        );
-
-
-    function updateHoursDisplay() {
-
-        if (
-            !startTimeInput ||
-            !endTimeInput ||
-            !hoursDisplay
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            !startTimeInput.value ||
-            !endTimeInput.value
-        ) {
-
-            hoursDisplay.textContent =
-                "0 hrs";
-
-            return;
-
-        }
-
-
-        const startParts =
-            startTimeInput.value
-                .split(":");
-
-
-        const endParts =
-            endTimeInput.value
-                .split(":");
-
-
-        const startMinutes =
-            (
-                parseInt(
-                    startParts[0],
-                    10
-                ) * 60
-            ) +
-            parseInt(
-                startParts[1],
-                10
-            );
-
-
-        const endMinutes =
-            (
-                parseInt(
-                    endParts[0],
-                    10
-                ) * 60
-            ) +
-            parseInt(
-                endParts[1],
-                10
-            );
-
-
-        const difference =
-            endMinutes -
-            startMinutes;
-
-
-        if (difference <= 0) {
-
-            hoursDisplay.textContent =
-                "0 hrs";
-
-            return;
-
-        }
-
-
-        const hours =
-            difference / 60;
-
-
-        hoursDisplay.textContent =
-            `${hours % 1 === 0
-                ? hours
-                : hours.toFixed(2)
-            } hrs`;
-
-    }
-
-
-    if (startTimeInput) {
-
-        startTimeInput.addEventListener(
-            "change",
-            updateHoursDisplay
-        );
-
-    }
-
-
-    if (endTimeInput) {
-
-        endTimeInput.addEventListener(
-            "change",
-            updateHoursDisplay
-        );
-
-    }
-
 
 </script>
 
