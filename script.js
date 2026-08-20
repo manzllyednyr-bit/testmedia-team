@@ -5,7 +5,7 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_PUBLISHABLE_KEY
 );
-
+console.log("NEW SCRIPT LOADED");
 const loginForm = document.querySelector("form");
 
 if (loginForm) {
