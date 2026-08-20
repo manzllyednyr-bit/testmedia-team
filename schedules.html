@@ -244,134 +244,6 @@
 
 
         <!-- =========================================
-             ALL SCHEDULES
-             ========================================= -->
-
-        <section class="dashboard-section collapsible-section">
-
-
-            <div class="collapsible-header">
-
-
-                <div>
-
-                    <h2>
-                        All Schedules
-                    </h2>
-
-                    <p>
-                        View and manage scheduled media duties.
-                    </p>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    class="collapse-button"
-                    id="toggleSchedulesBtn">
-
-                    Show
-
-                    <span
-                        class="collapse-arrow"
-                        id="schedulesArrow">
-
-                        ▼
-
-                    </span>
-
-                </button>
-
-
-            </div>
-
-
-
-            <!-- SCHEDULE CONTENT -->
-
-            <div
-                id="schedulesContent"
-                class="collapsible-content">
-
-
-                <div class="schedule-table">
-
-
-                    <div class="table-header">
-
-                        <div>
-                            Event
-                        </div>
-
-                        <div>
-                            Date
-                        </div>
-
-                        <div>
-                            Time
-                        </div>
-
-                        <div>
-                            Location
-                        </div>
-
-                        <div>
-                            Personnel
-                        </div>
-
-                    </div>
-
-
-                    <div id="scheduleList">
-
-
-                        <div class="empty-state">
-
-
-                            <div class="empty-icon">
-                                📅
-                            </div>
-
-
-                            <h3>
-                                No schedules yet
-                            </h3>
-
-
-                            <p>
-                                Create your first media schedule
-                                to get started.
-                            </p>
-
-
-                            <button
-                                type="button"
-                                class="primary-button"
-                                id="createScheduleEmptyBtn">
-
-                                Create Schedule
-
-                            </button>
-
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =========================================
              CREATE SCHEDULE
              ========================================= -->
 
@@ -561,6 +433,134 @@
         </section>
 
 
+
+        <!-- =========================================
+             ALL SCHEDULES
+             ========================================= -->
+
+        <section class="dashboard-section collapsible-section">
+
+
+            <div class="collapsible-header">
+
+
+                <div>
+
+                    <h2>
+                        All Schedules
+                    </h2>
+
+                    <p>
+                        View and manage scheduled media duties.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="collapse-button"
+                    id="toggleSchedulesBtn">
+
+                    Show
+
+                    <span
+                        class="collapse-arrow"
+                        id="schedulesArrow">
+
+                        ▼
+
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- SCHEDULE CONTENT -->
+
+            <div
+                id="schedulesContent"
+                class="collapsible-content">
+
+
+                <div class="schedule-table">
+
+
+                    <div class="table-header">
+
+                        <div>
+                            Event
+                        </div>
+
+                        <div>
+                            Date
+                        </div>
+
+                        <div>
+                            Time
+                        </div>
+
+                        <div>
+                            Location
+                        </div>
+
+                        <div>
+                            Personnel
+                        </div>
+
+                    </div>
+
+
+                    <div id="scheduleList">
+
+
+                        <div class="empty-state">
+
+
+                            <div class="empty-icon">
+                                📅
+                            </div>
+
+
+                            <h3>
+                                No schedules yet
+                            </h3>
+
+
+                            <p>
+                                Create your first media schedule
+                                to get started.
+                            </p>
+
+
+                            <button
+                                type="button"
+                                class="primary-button"
+                                id="createScheduleEmptyBtn">
+
+                                Create Schedule
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
     </main>
 
 
@@ -600,49 +600,6 @@
 
 <script>
 
-    /* =========================================
-       ALL SCHEDULES TOGGLE
-       ========================================= */
-
-    const toggleSchedulesBtn =
-        document.getElementById(
-            "toggleSchedulesBtn"
-        );
-
-    const schedulesContent =
-        document.getElementById(
-            "schedulesContent"
-        );
-
-    const schedulesArrow =
-        document.getElementById(
-            "schedulesArrow"
-        );
-
-
-    if (toggleSchedulesBtn) {
-
-        toggleSchedulesBtn.addEventListener(
-            "click",
-            function () {
-
-                const isOpen =
-                    schedulesContent.classList.toggle(
-                        "open"
-                    );
-
-
-                toggleSchedulesBtn.innerHTML =
-                    isOpen
-                        ? 'Hide <span class="collapse-arrow open">▼</span>'
-                        : 'Show <span class="collapse-arrow">▼</span>';
-
-            }
-        );
-
-    }
-
-
 
     /* =========================================
        CREATE SCHEDULE TOGGLE
@@ -652,6 +609,7 @@
         document.getElementById(
             "toggleCreateBtn"
         );
+
 
     const createScheduleContent =
         document.getElementById(
@@ -672,6 +630,46 @@
 
 
                 toggleCreateBtn.innerHTML =
+                    isOpen
+                        ? 'Hide <span class="collapse-arrow open">▼</span>'
+                        : 'Show <span class="collapse-arrow">▼</span>';
+
+            }
+        );
+
+    }
+
+
+
+    /* =========================================
+       ALL SCHEDULES TOGGLE
+       ========================================= */
+
+    const toggleSchedulesBtn =
+        document.getElementById(
+            "toggleSchedulesBtn"
+        );
+
+
+    const schedulesContent =
+        document.getElementById(
+            "schedulesContent"
+        );
+
+
+    if (toggleSchedulesBtn) {
+
+        toggleSchedulesBtn.addEventListener(
+            "click",
+            function () {
+
+                const isOpen =
+                    schedulesContent.classList.toggle(
+                        "open"
+                    );
+
+
+                toggleSchedulesBtn.innerHTML =
                     isOpen
                         ? 'Hide <span class="collapse-arrow open">▼</span>'
                         : 'Show <span class="collapse-arrow">▼</span>';
@@ -715,6 +713,7 @@
 
         }
     );
+
 
 </script>
 
