@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Personnel Dashboard - Media Team</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo">
+                MT
+            </div>
+
+            <div>
+                <h2>Media Team</h2>
+                <p>Scheduling System</p>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="personnel-dashboard.html"
+               class="nav-item active">
+                Dashboard
+            </a>
+
+            <a href="personnel-schedules.html"
+               class="nav-item">
+                My Schedules
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="index.html"
+               class="nav-item">
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Personnel Dashboard
+                </h1>
+
+                <p id="welcomeMessage">
+                    Welcome back.
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div
+                    class="profile-circle"
+                    id="profileInitial">
+                    P
+                </div>
+
+                <div>
+
+                    <strong id="profileName">
+                        Personnel
+                    </strong>
+
+                    <small>
+                        Media Personnel
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- STATISTICS -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📅
+                </div>
+
+                <div>
+
+                    <p>
+                        My Schedules
+                    </p>
+
+                    <h2 id="totalSchedules">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📋
+                </div>
+
+                <div>
+
+                    <p>
+                        Upcoming
+                    </p>
+
+                    <h2 id="upcomingSchedules">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⏱
+                </div>
+
+                <div>
+
+                    <p>
+                        Assigned Hours
+                    </p>
+
+                    <h2 id="assignedHours">
+                        0 hrs
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👤
+                </div>
+
+                <div>
+
+                    <p>
+                        Role
+                    </p>
+
+                    <h2 style="font-size: 18px;">
+                        Personnel
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- MY UPCOMING SCHEDULES -->
+        <section class="dashboard-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        My Upcoming Schedules
+                    </h2>
+
+                    <p>
+                        Your assigned media duties
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="schedule-table">
+
+                <div class="table-header">
+
+                    <span>
+                        Event
+                    </span>
+
+                    <span>
+                        Date
+                    </span>
+
+                    <span>
+                        Time
+                    </span>
+
+                    <span>
+                        Location
+                    </span>
+
+                    <span>
+                        Description
+                    </span>
+
+                </div>
+
+
+                <div id="myScheduleList">
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            📅
+                        </div>
+
+                        <h3>
+                            Loading schedules...
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- SUPABASE LOGIN / CLIENT -->
+<script src="script.js"></script>
+
+<!-- PERSONNEL DASHBOARD -->
+<script src="personnel-dashboard.js"></script>
+
+</body>
+
+</html>
