@@ -1,6 +1,10 @@
 console.log("CALENDAR SCRIPT LOADED");
 
 
+/* ==========================================
+   ELEMENTS
+   ========================================== */
+
 const currentMonthElement =
     document.getElementById("currentMonth");
 
@@ -21,11 +25,17 @@ let currentDate = new Date();
 
 
 /* ==========================================
-   CHECK IF THIS IS ADMIN DASHBOARD
+   ADMIN DASHBOARD CHECK
    ========================================== */
 
 const isAdminDashboard =
     window.location.pathname.endsWith("admin.html");
+
+
+console.log(
+    "Admin Dashboard:",
+    isAdminDashboard
+);
 
 
 /* ==========================================
@@ -60,7 +70,9 @@ async function loadCalendar() {
             error
         );
 
+
         calendarDays.innerHTML = `
+
             <div class="empty-state">
 
                 <div class="empty-icon">
@@ -76,6 +88,7 @@ async function loadCalendar() {
                 </p>
 
             </div>
+
         `;
 
         return;
@@ -117,7 +130,9 @@ async function loadCalendar() {
         error: assignmentError
     } = await supabaseClient
         .from("assignments")
-        .select("schedule_id, personnel_id");
+        .select(
+            "schedule_id, personnel_id"
+        );
 
 
     if (assignmentError) {
@@ -151,6 +166,11 @@ function renderCalendar(
     assignments
 ) {
 
+    if (!calendarDays) {
+        return;
+    }
+
+
     calendarDays.innerHTML = "";
 
 
@@ -161,18 +181,26 @@ function renderCalendar(
         currentDate.getMonth();
 
 
-    currentMonthElement.textContent =
-        currentDate.toLocaleString(
-            "default",
-            {
-                month: "long",
-                year: "numeric"
-            }
-        );
+    /* ======================================
+       MONTH TITLE
+       ====================================== */
+
+    if (currentMonthElement) {
+
+        currentMonthElement.textContent =
+            currentDate.toLocaleString(
+                "default",
+                {
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+    }
 
 
     /* ======================================
-       FIRST DAY
+       FIRST DAY OF MONTH
        ====================================== */
 
     const firstDay =
@@ -238,7 +266,7 @@ function renderCalendar(
 
 
     /* ======================================
-       CURRENT MONTH
+       CURRENT MONTH DAYS
        ====================================== */
 
     for (
@@ -258,7 +286,9 @@ function renderCalendar(
             `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
 
 
-        /* FIND EVENTS */
+        /* ==================================
+           FIND SCHEDULES FOR THIS DATE
+           ================================== */
 
         const daySchedules =
             schedules.filter(
@@ -286,7 +316,9 @@ function renderCalendar(
                     "calendar-event";
 
 
-                /* FIND ASSIGNED PERSONNEL */
+                /* ==================================
+                   FIND ASSIGNED PERSONNEL
+                   ================================== */
 
                 const assignedPersonnel =
                     assignments
@@ -325,6 +357,10 @@ function renderCalendar(
                         ? assignedPersonnel.join(", ")
                         : "Unassigned";
 
+
+                /* ==================================
+                   EVENT CONTENT
+                   ================================== */
 
                 event.innerHTML = `
 
@@ -389,7 +425,9 @@ function renderCalendar(
     const remainingCells =
         totalCells % 7 === 0
             ? 0
-            : 7 - (totalCells % 7);
+            : 7 - (
+                totalCells % 7
+            );
 
 
     for (
@@ -469,7 +507,9 @@ function showScheduleDetails(
     personnelText
 ) {
 
-    /* Remove existing modal */
+    /* ======================================
+       REMOVE OLD MODAL
+       ====================================== */
 
     const existingModal =
         document.getElementById(
@@ -513,7 +553,9 @@ function showScheduleDetails(
                     type="button"
                     class="primary-button"
                     id="editScheduleButton"
-                    style="flex: 1;"
+                    style="
+                        flex: 1;
+                    "
                 >
                     Edit
                 </button>
@@ -537,6 +579,10 @@ function showScheduleDetails(
 
     }
 
+
+    /* ======================================
+       MODAL
+       ====================================== */
 
     modal.innerHTML = `
 
@@ -565,7 +611,9 @@ function showScheduleDetails(
                     </strong>
 
                     <span>
-                        ${escapeHTML(schedule.event_date)}
+                        ${escapeHTML(
+                            schedule.event_date
+                        )}
                     </span>
 
                 </div>
@@ -578,9 +626,13 @@ function showScheduleDetails(
                     </strong>
 
                     <span>
-                        ${formatTime(schedule.start_time)}
+                        ${formatTime(
+                            schedule.start_time
+                        )}
                         -
-                        ${formatTime(schedule.end_time)}
+                        ${formatTime(
+                            schedule.end_time
+                        )}
                     </span>
 
                 </div>
@@ -593,7 +645,9 @@ function showScheduleDetails(
                     </strong>
 
                     <span>
-                        ${escapeHTML(schedule.location)}
+                        ${escapeHTML(
+                            schedule.location
+                        )}
                     </span>
 
                 </div>
@@ -606,7 +660,9 @@ function showScheduleDetails(
                     </strong>
 
                     <span>
-                        ${escapeHTML(personnelText)}
+                        ${escapeHTML(
+                            personnelText
+                        )}
                     </span>
 
                 </div>
@@ -637,7 +693,10 @@ function showScheduleDetails(
                     type="button"
                     class="primary-button"
                     id="closeScheduleModalButton"
-                    style="margin-top: 15px;"
+                    style="
+                        width: 100%;
+                        margin-top: 15px;
+                    "
                 >
                     Close
                 </button>
@@ -656,49 +715,63 @@ function showScheduleDetails(
 
 
     /* ======================================
-       CLOSE WITH X
+       CLOSE X
        ====================================== */
 
-    document
-        .getElementById(
+    const closeButton =
+        document.getElementById(
             "closeScheduleModal"
-        )
-        .addEventListener(
+        );
+
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
             "click",
             closeScheduleDetails
         );
 
+    }
+
 
     /* ======================================
-       CLOSE WITH BUTTON
+       CLOSE BUTTON
        ====================================== */
 
-    document
-        .getElementById(
+    const closeBottomButton =
+        document.getElementById(
             "closeScheduleModalButton"
-        )
-        .addEventListener(
+        );
+
+
+    if (closeBottomButton) {
+
+        closeBottomButton.addEventListener(
             "click",
             closeScheduleDetails
         );
 
+    }
+
 
     /* ======================================
-       CLOSE OUTSIDE MODAL
+       CLICK OUTSIDE MODAL
        ====================================== */
 
-    document
-        .querySelector(
+    const overlay =
+        document.querySelector(
             ".schedule-modal-overlay"
-        )
-        .addEventListener(
+        );
+
+
+    if (overlay) {
+
+        overlay.addEventListener(
             "click",
             function (event) {
 
                 if (
-                    event.target.classList.contains(
-                        "schedule-modal-overlay"
-                    )
+                    event.target === overlay
                 ) {
 
                     closeScheduleDetails();
@@ -707,6 +780,8 @@ function showScheduleDetails(
 
             }
         );
+
+    }
 
 
     /* ======================================
@@ -726,8 +801,6 @@ function showScheduleDetails(
             editButton.addEventListener(
                 "click",
                 function () {
-
-                    closeScheduleDetails();
 
                     editScheduleFromCalendar(
                         schedule
@@ -770,117 +843,484 @@ function showScheduleDetails(
 
 
 /* ==========================================
-   EDIT SCHEDULE FROM CALENDAR
+   EDIT SCHEDULE DIRECTLY FROM CALENDAR
    ========================================== */
 
 function editScheduleFromCalendar(
     schedule
 ) {
 
-    /* Look for schedule form on dashboard */
-
-    const formContainer =
+    const modal =
         document.getElementById(
-            "scheduleFormContainer"
+            "scheduleDetailsModal"
         );
 
 
-    const form =
-        document.getElementById(
-            "scheduleForm"
-        );
-
-
-    if (!formContainer || !form) {
-
-        alert(
-            "Schedule editing form could not be found."
-        );
-
+    if (!modal) {
         return;
-
     }
 
 
-    /* Fill the existing form */
-
-    document.getElementById(
-        "eventName"
-    ).value =
-        schedule.title || "";
-
-
-    document.getElementById(
-        "scheduleDate"
-    ).value =
-        schedule.event_date || "";
-
-
-    document.getElementById(
-        "startTime"
-    ).value =
-        schedule.start_time
-            ? schedule.start_time.substring(
-                0,
-                5
-            )
-            : "";
-
-
-    document.getElementById(
-        "endTime"
-    ).value =
-        schedule.end_time
-            ? schedule.end_time.substring(
-                0,
-                5
-            )
-            : "";
-
-
-    document.getElementById(
-        "location"
-    ).value =
-        schedule.location || "";
-
-
-    document.getElementById(
-        "description"
-    ).value =
-        schedule.description || "";
-
-
-    /*
-       Tell schedules.js which schedule
-       is being edited.
-    */
-
-    if (
-        typeof window.startScheduleEdit ===
-        "function"
-    ) {
-
-        window.startScheduleEdit(
-            schedule.id
+    const scheduleModal =
+        modal.querySelector(
+            ".schedule-modal"
         );
 
+
+    if (!scheduleModal) {
+        return;
     }
 
 
-    formContainer.style.display =
-        "block";
+    /* ======================================
+       EDIT FORM
+       ====================================== */
+
+    scheduleModal.innerHTML = `
+
+        <button
+            type="button"
+            class="schedule-modal-close"
+            id="closeEditScheduleModal"
+        >
+            ×
+        </button>
 
 
-    formContainer.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
+        <h2>
+            Edit Schedule
+        </h2>
+
+
+        <div class="form-group">
+
+            <label
+                for="calendarEditEventName"
+            >
+                Event Name
+            </label>
+
+            <input
+                type="text"
+                id="calendarEditEventName"
+                value="${escapeHTML(
+                    schedule.title || ""
+                )}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label
+                for="calendarEditDate"
+            >
+                Date
+            </label>
+
+            <input
+                type="date"
+                id="calendarEditDate"
+                value="${escapeHTML(
+                    schedule.event_date || ""
+                )}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label
+                for="calendarEditStartTime"
+            >
+                Start Time
+            </label>
+
+            <input
+                type="time"
+                id="calendarEditStartTime"
+                value="${
+                    schedule.start_time
+                        ? schedule.start_time.substring(
+                            0,
+                            5
+                        )
+                        : ""
+                }"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label
+                for="calendarEditEndTime"
+            >
+                End Time
+            </label>
+
+            <input
+                type="time"
+                id="calendarEditEndTime"
+                value="${
+                    schedule.end_time
+                        ? schedule.end_time.substring(
+                            0,
+                            5
+                        )
+                        : ""
+                }"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label
+                for="calendarEditLocation"
+            >
+                Location
+            </label>
+
+            <input
+                type="text"
+                id="calendarEditLocation"
+                value="${escapeHTML(
+                    schedule.location || ""
+                )}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label
+                for="calendarEditDescription"
+            >
+                Description
+            </label>
+
+            <input
+                type="text"
+                id="calendarEditDescription"
+                value="${escapeHTML(
+                    schedule.description || ""
+                )}"
+            >
+
+        </div>
+
+
+        <div
+            style="
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            "
+        >
+
+            <button
+                type="button"
+                class="primary-button"
+                id="saveCalendarEditButton"
+                style="
+                    flex: 1;
+                "
+            >
+                Save Changes
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                id="deleteCalendarEditButton"
+                style="
+                    flex: 1;
+                    background: #b42318;
+                "
+            >
+                Delete
+            </button>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="primary-button"
+            id="cancelCalendarEditButton"
+            style="
+                width: 100%;
+                margin-top: 10px;
+            "
+        >
+            Cancel
+        </button>
+
+    `;
+
+
+    /* ======================================
+       CLOSE EDIT
+       ====================================== */
+
+    document
+        .getElementById(
+            "closeEditScheduleModal"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                closeScheduleDetails();
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "cancelCalendarEditButton"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                closeScheduleDetails();
+
+            }
+        );
+
+
+    /* ======================================
+       SAVE CHANGES
+       ====================================== */
+
+    document
+        .getElementById(
+            "saveCalendarEditButton"
+        )
+        .addEventListener(
+            "click",
+            async function () {
+
+                const title =
+                    document
+                        .getElementById(
+                            "calendarEditEventName"
+                        )
+                        .value
+                        .trim();
+
+
+                const eventDate =
+                    document
+                        .getElementById(
+                            "calendarEditDate"
+                        )
+                        .value;
+
+
+                const startTime =
+                    document
+                        .getElementById(
+                            "calendarEditStartTime"
+                        )
+                        .value;
+
+
+                const endTime =
+                    document
+                        .getElementById(
+                            "calendarEditEndTime"
+                        )
+                        .value;
+
+
+                const location =
+                    document
+                        .getElementById(
+                            "calendarEditLocation"
+                        )
+                        .value
+                        .trim();
+
+
+                const description =
+                    document
+                        .getElementById(
+                            "calendarEditDescription"
+                        )
+                        .value
+                        .trim();
+
+
+                /* ==================================
+                   VALIDATION
+                   ================================== */
+
+                if (
+                    !title ||
+                    !eventDate ||
+                    !startTime ||
+                    !endTime ||
+                    !location
+                ) {
+
+                    alert(
+                        "Please complete all required fields."
+                    );
+
+                    return;
+
+                }
+
+
+                if (endTime <= startTime) {
+
+                    alert(
+                        "End time must be later than start time."
+                    );
+
+                    return;
+
+                }
+
+
+                const button =
+                    document.getElementById(
+                        "saveCalendarEditButton"
+                    );
+
+
+                button.disabled =
+                    true;
+
+
+                button.textContent =
+                    "Saving...";
+
+
+                /* ==================================
+                   UPDATE SUPABASE
+                   ================================== */
+
+                const {
+                    data,
+                    error
+                } = await supabaseClient
+                    .from("schedules")
+                    .update({
+                        title: title,
+                        event_date: eventDate,
+                        start_time: startTime,
+                        end_time: endTime,
+                        location: location,
+                        description: description
+                    })
+                    .eq(
+                        "id",
+                        schedule.id
+                    )
+                    .select();
+
+
+                if (error) {
+
+                    console.error(
+                        "Calendar schedule update error:",
+                        error
+                    );
+
+
+                    alert(
+                        "Could not update schedule: " +
+                        error.message
+                    );
+
+
+                    button.disabled =
+                        false;
+
+
+                    button.textContent =
+                        "Save Changes";
+
+
+                    return;
+
+                }
+
+
+                console.log(
+                    "Schedule updated:",
+                    data
+                );
+
+
+                alert(
+                    "Schedule updated successfully!"
+                );
+
+
+                closeScheduleDetails();
+
+
+                /* Refresh calendar */
+
+                loadCalendar();
+
+
+                /* Refresh dashboard statistics */
+
+                if (
+                    typeof window.loadAdminDashboard ===
+                    "function"
+                ) {
+
+                    window.loadAdminDashboard();
+
+                }
+
+            }
+        );
+
+
+    /* ======================================
+       DELETE FROM EDIT SCREEN
+       ====================================== */
+
+    document
+        .getElementById(
+            "deleteCalendarEditButton"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                deleteScheduleFromCalendar(
+                    schedule.id
+                );
+
+            }
+        );
 
 }
 
 
 /* ==========================================
-   DELETE SCHEDULE FROM CALENDAR
+   DELETE SCHEDULE
    ========================================== */
 
 async function deleteScheduleFromCalendar(
@@ -904,19 +1344,30 @@ async function deleteScheduleFromCalendar(
         );
 
 
-    if (deleteButton) {
+    const deleteEditButton =
+        document.getElementById(
+            "deleteCalendarEditButton"
+        );
 
-        deleteButton.disabled =
+
+    const activeDeleteButton =
+        deleteEditButton ||
+        deleteButton;
+
+
+    if (activeDeleteButton) {
+
+        activeDeleteButton.disabled =
             true;
 
-        deleteButton.textContent =
+        activeDeleteButton.textContent =
             "Deleting...";
 
     }
 
 
     /* ======================================
-       DELETE ASSIGNMENTS
+       DELETE ASSIGNMENTS FIRST
        ====================================== */
 
     const {
@@ -939,17 +1390,17 @@ async function deleteScheduleFromCalendar(
 
 
         alert(
-            "Could not delete assignments: " +
+            "Could not delete personnel assignments: " +
             assignmentError.message
         );
 
 
-        if (deleteButton) {
+        if (activeDeleteButton) {
 
-            deleteButton.disabled =
+            activeDeleteButton.disabled =
                 false;
 
-            deleteButton.textContent =
+            activeDeleteButton.textContent =
                 "Delete";
 
         }
@@ -988,12 +1439,12 @@ async function deleteScheduleFromCalendar(
         );
 
 
-        if (deleteButton) {
+        if (activeDeleteButton) {
 
-            deleteButton.disabled =
+            activeDeleteButton.disabled =
                 false;
 
-            deleteButton.textContent =
+            activeDeleteButton.textContent =
                 "Delete";
 
         }
@@ -1011,12 +1462,16 @@ async function deleteScheduleFromCalendar(
     );
 
 
-    /* Refresh dashboard calendar */
+    /* ======================================
+       REFRESH CALENDAR
+       ====================================== */
 
     loadCalendar();
 
 
-    /* Refresh dashboard statistics */
+    /* ======================================
+       REFRESH DASHBOARD
+       ====================================== */
 
     if (
         typeof window.loadAdminDashboard ===
@@ -1109,22 +1564,36 @@ function escapeHTML(value) {
     ) {
 
         return "";
-
     }
 
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
 
 /* ==========================================
-   MONTH BUTTONS
+   PREVIOUS MONTH
    ========================================== */
 
 if (previousMonthBtn) {
@@ -1137,6 +1606,7 @@ if (previousMonthBtn) {
                 currentDate.getMonth() - 1
             );
 
+
             loadCalendar();
 
         }
@@ -1144,6 +1614,10 @@ if (previousMonthBtn) {
 
 }
 
+
+/* ==========================================
+   NEXT MONTH
+   ========================================== */
 
 if (nextMonthBtn) {
 
@@ -1155,6 +1629,7 @@ if (nextMonthBtn) {
                 currentDate.getMonth() + 1
             );
 
+
             loadCalendar();
 
         }
@@ -1162,6 +1637,10 @@ if (nextMonthBtn) {
 
 }
 
+
+/* ==========================================
+   TODAY
+   ========================================== */
 
 if (todayBtn) {
 
@@ -1171,6 +1650,7 @@ if (todayBtn) {
 
             currentDate =
                 new Date();
+
 
             loadCalendar();
 
