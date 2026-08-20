@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Schedules - Media Team</title>
 
     <link rel="stylesheet" href="style.css">
@@ -12,6 +14,7 @@
 
 <div class="dashboard">
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
 
         <div class="sidebar-logo">
@@ -62,6 +65,7 @@
     </aside>
 
 
+    <!-- MAIN CONTENT -->
     <main class="main-content">
 
         <div class="dashboard-header">
@@ -87,6 +91,7 @@
         </div>
 
 
+        <!-- SCHEDULE SECTION -->
         <div class="dashboard-section">
 
             <div class="section-header">
@@ -96,13 +101,16 @@
                     <p>Create and manage upcoming media duties.</p>
                 </div>
 
-                <button class="primary-button" id="createScheduleBtn">
+                <button
+                    class="primary-button"
+                    id="createScheduleBtn">
                     + Create Schedule
                 </button>
 
             </div>
 
 
+            <!-- SCHEDULE LIST -->
             <div class="schedule-table">
 
                 <div class="table-header">
@@ -131,12 +139,140 @@
                         </p>
 
                         <button
+                            type="button"
                             class="primary-button"
                             id="createScheduleEmptyBtn">
                             Create Schedule
                         </button>
 
                     </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CREATE SCHEDULE FORM -->
+            <div
+                id="scheduleFormContainer"
+                style="display: none; margin-top: 25px;">
+
+                <div class="dashboard-section">
+
+                    <div class="section-header">
+
+                        <div>
+                            <h2>Create Schedule</h2>
+                            <p>Add a new media team schedule.</p>
+                        </div>
+
+                    </div>
+
+
+                    <form id="scheduleForm">
+
+                        <div class="form-group">
+
+                            <label for="eventName">
+                                Event Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="eventName"
+                                placeholder="Example: Sunday Worship Service"
+                                required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="scheduleDate">
+                                Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="scheduleDate"
+                                required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="startTime">
+                                Start Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="startTime"
+                                required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="endTime">
+                                End Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="endTime"
+                                required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="location">
+                                Location
+                            </label>
+
+                            <input
+                                type="text"
+                                id="location"
+                                placeholder="Example: AUP Chapel"
+                                required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="description">
+                                Description
+                            </label>
+
+                            <input
+                                type="text"
+                                id="description"
+                                placeholder="Optional description">
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button">
+                            Save Schedule
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="primary-button"
+                            id="cancelScheduleBtn"
+                            style="margin-left: 10px;">
+                            Cancel
+                        </button>
+
+                    </form>
 
                 </div>
 
@@ -149,9 +285,17 @@
 </div>
 
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
+<!-- LOGIN SCRIPT -->
 <script src="script.js"></script>
 
+
+<!-- SCHEDULE SCRIPT -->
+<script src="schedules.js"></script>
+
 </body>
+
 </html>
