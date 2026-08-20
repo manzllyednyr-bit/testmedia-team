@@ -574,6 +574,10 @@ async function loadSchedules() {
             let personnelHTML = "";
 
 
+            /* ==================================
+               ASSIGNED PERSONNEL
+               ================================== */
+
             if (
                 scheduleAssignments.length > 0
             ) {
@@ -602,46 +606,55 @@ async function loadSchedules() {
 
 
                 personnelHTML = `
-                    <span>
-                        ${names.join(", ")}
-                    </span>
+
+                    <div class="assigned-personnel">
+
+                        <strong>
+                            Assigned:
+                        </strong>
+
+                        <div>
+                            ${names
+                                .map(function (name) {
+
+                                    return `
+                                        <span
+                                            style="
+                                                display: inline-block;
+                                                background: #e8f1fa;
+                                                color: #123f6d;
+                                                padding: 5px 8px;
+                                                border-radius: 6px;
+                                                margin: 3px 3px 3px 0;
+                                                font-size: 12px;
+                                            "
+                                        >
+                                            ${escapeHTML(name)}
+                                        </span>
+                                    `;
+
+                                })
+                                .join("")
+                            }
+                        </div>
+
+                    </div>
+
                 `;
 
             } else {
 
                 personnelHTML = `
-                    <select
-                        class="personnel-select"
-                        data-schedule-id="${schedule.id}">
 
-                        <option value="">
-                            Select Personnel
-                        </option>
+                    <div
+                        style="
+                            color: #777;
+                            margin-bottom: 8px;
+                        "
+                    >
+                        Unassigned
+                    </div>
 
-                        ${
-                            personnel.map(
-                                function (person) {
-
-                                    return `
-                                        <option value="${person.id}">
-                                            ${person.full_name}
-                                        </option>
-                                    `;
-
-                                }
-                            ).join("")
-                        }
-
-                    </select>
-
-                    <button
-                        type="button"
-                        class="primary-button assign-button"
-                        data-schedule-id="${schedule.id}">
-
-                        Assign
-
-                    </button>
                 `;
 
             }
@@ -675,6 +688,18 @@ async function loadSchedules() {
 
                     ${personnelHTML}
 
+                    <button
+                        type="button"
+                        class="primary-button manage-personnel-button"
+                        data-schedule-id="${schedule.id}"
+                        style="
+                            margin-top: 8px;
+                        "
+                    >
+                        Manage Personnel
+                    </button>
+
+
                     <div
                         style="
                             margin-top: 8px;
@@ -687,10 +712,9 @@ async function loadSchedules() {
                         <button
                             type="button"
                             class="primary-button edit-schedule-button"
-                            data-schedule-id="${schedule.id}">
-
+                            data-schedule-id="${schedule.id}"
+                        >
                             Edit
-
                         </button>
 
 
@@ -700,10 +724,9 @@ async function loadSchedules() {
                             data-schedule-id="${schedule.id}"
                             style="
                                 background: #b42318;
-                            ">
-
+                            "
+                        >
                             Delete
-
                         </button>
 
                     </div>
@@ -722,21 +745,32 @@ async function loadSchedules() {
 
 
     /* ======================================
-       ASSIGN BUTTONS
+       MANAGE PERSONNEL BUTTONS
        ====================================== */
 
-    const assignButtons =
+    const manageButtons =
         document.querySelectorAll(
-            ".assign-button"
+            ".manage-personnel-button"
         );
 
 
-    assignButtons.forEach(
+    manageButtons.forEach(
         function (button) {
 
             button.addEventListener(
                 "click",
-                assignPersonnel
+                function () {
+
+                    const scheduleId =
+                        button.dataset.scheduleId;
+
+                    showPersonnelManager(
+                        scheduleId,
+                        personnel,
+                        assignments
+                    );
+
+                }
             );
 
         }
@@ -790,111 +824,423 @@ async function loadSchedules() {
 
 
 /* ==========================================
-   ASSIGN PERSONNEL
+   PERSONNEL MANAGER
    ========================================== */
 
-async function assignPersonnel(event) {
+function showPersonnelManager(
+    scheduleId,
+    personnel,
+    assignments
+) {
 
-    const button =
-        event.currentTarget;
-
-
-    const scheduleId =
-        button.dataset.scheduleId;
-
-
-    const select =
-        document.querySelector(
-            `.personnel-select[data-schedule-id="${scheduleId}"]`
+    const existingModal =
+        document.getElementById(
+            "personnelManagerModal"
         );
 
 
-    if (!select || !select.value) {
-
-        alert(
-            "Please select a personnel member."
-        );
-
-        return;
-
+    if (existingModal) {
+        existingModal.remove();
     }
 
 
-    const personnelId =
-        select.value;
+    const assignedIds =
+        assignments
+            .filter(function (assignment) {
+
+                return assignment.schedule_id ===
+                    scheduleId;
+
+            })
+            .map(function (assignment) {
+
+                return assignment.personnel_id;
+
+            });
 
 
-    const {
-        data: { user },
-        error: userError
-    } =
-        await supabaseClient.auth.getUser();
+    const modal =
+        document.createElement("div");
 
 
-    if (userError || !user) {
+    modal.id =
+        "personnelManagerModal";
 
-        alert(
-            "You are not logged in."
+
+    modal.innerHTML = `
+
+        <div
+            style="
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.45);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                padding: 20px;
+            "
+        >
+
+            <div
+                style="
+                    background: white;
+                    width: 100%;
+                    max-width: 500px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    border-radius: 14px;
+                    padding: 30px;
+                    position: relative;
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+                "
+            >
+
+                <button
+                    type="button"
+                    id="closePersonnelManager"
+                    style="
+                        position: absolute;
+                        top: 12px;
+                        right: 18px;
+                        border: none;
+                        background: transparent;
+                        font-size: 28px;
+                        color: #667085;
+                        cursor: pointer;
+                    "
+                >
+                    ×
+                </button>
+
+
+                <h2
+                    style="
+                        margin-top: 0;
+                        color: #123f6d;
+                    "
+                >
+                    Manage Personnel
+                </h2>
+
+
+                <p
+                    style="
+                        color: #667085;
+                        font-size: 14px;
+                    "
+                >
+                    Select everyone assigned to this schedule.
+                </p>
+
+
+                <div
+                    id="personnelCheckboxList"
+                    style="
+                        margin-top: 20px;
+                    "
+                >
+
+                    ${
+                        personnel.length === 0
+                            ? `
+                                <p>
+                                    No personnel accounts found.
+                                </p>
+                            `
+                            : personnel.map(
+                                function (person) {
+
+                                    const checked =
+                                        assignedIds.includes(
+                                            person.id
+                                        )
+                                            ? "checked"
+                                            : "";
+
+
+                                    return `
+
+                                        <label
+                                            style="
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 10px;
+                                                padding: 12px;
+                                                margin-bottom: 8px;
+                                                background: #f8fafc;
+                                                border-radius: 8px;
+                                                cursor: pointer;
+                                            "
+                                        >
+
+                                            <input
+                                                type="checkbox"
+                                                class="personnel-checkbox"
+                                                value="${person.id}"
+                                                ${checked}
+                                            >
+
+                                            <span>
+                                                ${escapeHTML(
+                                                    person.full_name
+                                                )}
+                                            </span>
+
+                                        </label>
+
+                                    `;
+
+                                }
+                            ).join("")
+                    }
+
+                </div>
+
+
+                <div
+                    style="
+                        margin-top: 20px;
+                        display: flex;
+                        gap: 10px;
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="savePersonnelAssignments"
+                    >
+                        Save Personnel
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="cancelPersonnelManager"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    /* CLOSE BUTTON */
+
+    document
+        .getElementById(
+            "closePersonnelManager"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                modal.remove();
+
+            }
         );
 
-        return;
 
-    }
+    /* CANCEL */
+
+    document
+        .getElementById(
+            "cancelPersonnelManager"
+        )
+        .addEventListener(
+            "click",
+            function () {
+
+                modal.remove();
+
+            }
+        );
 
 
-    button.disabled = true;
+    /* SAVE */
 
-    button.textContent =
-        "Assigning...";
+    document
+        .getElementById(
+            "savePersonnelAssignments"
+        )
+        .addEventListener(
+            "click",
+            async function () {
 
+                await savePersonnelAssignments(
+                    scheduleId,
+                    modal
+                );
+
+            }
+        );
+
+}
+
+
+/* ==========================================
+   SAVE MULTIPLE PERSONNEL
+   ========================================== */
+
+async function savePersonnelAssignments(
+    scheduleId,
+    modal
+) {
+
+    const checkboxes =
+        modal.querySelectorAll(
+            ".personnel-checkbox"
+        );
+
+
+    const selectedPersonnel =
+        Array.from(
+            checkboxes
+        )
+            .filter(function (checkbox) {
+
+                return checkbox.checked;
+
+            })
+            .map(function (checkbox) {
+
+                return checkbox.value;
+
+            });
+
+
+    const saveButton =
+        modal.querySelector(
+            "#savePersonnelAssignments"
+        );
+
+
+    saveButton.disabled = true;
+
+    saveButton.textContent =
+        "Saving...";
+
+
+    /* ======================================
+       REMOVE CURRENT ASSIGNMENTS
+       ====================================== */
 
     const {
-        data,
-        error
+        error: deleteError
     } = await supabaseClient
         .from("assignments")
-        .insert([
-            {
-                schedule_id: scheduleId,
-                personnel_id: personnelId
-            }
-        ])
-        .select();
+        .delete()
+        .eq(
+            "schedule_id",
+            scheduleId
+        );
 
 
-    if (error) {
+    if (deleteError) {
 
         console.error(
-            "Assignment error:",
-            error
+            "Assignment delete error:",
+            deleteError
         );
 
         alert(
-            "Could not assign personnel: " +
-            error.message
+            "Could not update personnel: " +
+            deleteError.message
         );
 
 
-        button.disabled = false;
+        saveButton.disabled = false;
 
-        button.textContent =
-            "Assign";
+        saveButton.textContent =
+            "Save Personnel";
 
         return;
 
     }
 
 
-    console.log(
-        "Assignment created:",
-        data
-    );
+    /* ======================================
+       INSERT NEW ASSIGNMENTS
+       ====================================== */
+
+    if (
+        selectedPersonnel.length > 0
+    ) {
+
+        const rows =
+            selectedPersonnel.map(
+                function (personnelId) {
+
+                    return {
+                        schedule_id:
+                            scheduleId,
+
+                        personnel_id:
+                            personnelId
+                    };
+
+                }
+            );
+
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("assignments")
+            .insert(rows)
+            .select();
+
+
+        if (error) {
+
+            console.error(
+                "Assignment save error:",
+                error
+            );
+
+            alert(
+                "Could not save personnel: " +
+                error.message
+            );
+
+
+            saveButton.disabled = false;
+
+            saveButton.textContent =
+                "Save Personnel";
+
+            return;
+
+        }
+
+
+        console.log(
+            "Personnel assignments saved:",
+            data
+        );
+
+    }
 
 
     alert(
-        "Personnel assigned successfully!"
+        "Personnel assignments updated successfully!"
     );
 
+
+    modal.remove();
 
     loadSchedules();
 
@@ -1021,7 +1367,7 @@ async function deleteSchedule(event) {
 
     const confirmed =
         confirm(
-            "Are you sure you want to delete this schedule?\n\nThis will also remove its personnel assignments."
+            "Are you sure you want to delete this schedule?\n\nThis will also remove all personnel assignments."
         );
 
 
@@ -1037,7 +1383,7 @@ async function deleteSchedule(event) {
 
 
     /* ======================================
-       DELETE ASSIGNMENTS FIRST
+       DELETE ASSIGNMENTS
        ====================================== */
 
     const {
