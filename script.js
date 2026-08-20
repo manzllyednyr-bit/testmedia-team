@@ -55,7 +55,6 @@ if (loginForm) {
             window.location.href = "personnel.html";
         } else {
             alert("Your account does not have a valid role.");
-        }
-
-});
+     }
+    });
 }
