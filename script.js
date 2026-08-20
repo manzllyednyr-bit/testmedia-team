@@ -29,5 +29,11 @@ loginForm.addEventListener("submit", async function (event) {
         return;
     }
 
-    alert("Login successful! Welcome.");
+     if (profile.role === "admin") {
+        window.location.href = "admin.html";
+    } else if (profile.role === "personnel") {
+        window.location.href = "personnel.html";
+    } else {
+        alert("Your account does not have a valid role.");
+    }
 });
