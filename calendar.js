@@ -1,5 +1,6 @@
 console.log("CALENDAR SCRIPT LOADED");
 
+
 const currentMonthElement =
     document.getElementById("currentMonth");
 
@@ -15,18 +16,28 @@ const nextMonthBtn =
 const todayBtn =
     document.getElementById("todayBtn");
 
+
 let currentDate = new Date();
 
 
-// ==========================================
-// LOAD CALENDAR
-// ==========================================
+/* ==========================================
+   CHECK IF THIS IS ADMIN DASHBOARD
+   ========================================== */
+
+const isAdminDashboard =
+    window.location.pathname.endsWith("admin.html");
+
+
+/* ==========================================
+   LOAD CALENDAR
+   ========================================== */
 
 async function loadCalendar() {
 
     if (!calendarDays) {
         return;
     }
+
 
     const {
         data: schedules,
@@ -36,7 +47,11 @@ async function loadCalendar() {
         .select("*")
         .order("event_date", {
             ascending: true
+        })
+        .order("start_time", {
+            ascending: true
         });
+
 
     if (error) {
 
@@ -45,11 +60,32 @@ async function loadCalendar() {
             error
         );
 
+        calendarDays.innerHTML = `
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Could not load schedules
+                </h3>
+
+                <p>
+                    ${escapeHTML(error.message)}
+                </p>
+
+            </div>
+        `;
+
         return;
+
     }
 
 
-    // GET PERSONNEL
+    /* ======================================
+       GET PERSONNEL
+       ====================================== */
 
     const {
         data: personnel,
@@ -59,6 +95,7 @@ async function loadCalendar() {
         .select("id, full_name")
         .eq("role", "personnel");
 
+
     if (personnelError) {
 
         console.error(
@@ -67,10 +104,13 @@ async function loadCalendar() {
         );
 
         return;
+
     }
 
 
-    // GET ASSIGNMENTS
+    /* ======================================
+       GET ASSIGNMENTS
+       ====================================== */
 
     const {
         data: assignments,
@@ -78,6 +118,7 @@ async function loadCalendar() {
     } = await supabaseClient
         .from("assignments")
         .select("schedule_id, personnel_id");
+
 
     if (assignmentError) {
 
@@ -87,6 +128,7 @@ async function loadCalendar() {
         );
 
         return;
+
     }
 
 
@@ -95,12 +137,13 @@ async function loadCalendar() {
         personnel,
         assignments
     );
+
 }
 
 
-// ==========================================
-// RENDER CALENDAR
-// ==========================================
+/* ==========================================
+   RENDER CALENDAR
+   ========================================== */
 
 function renderCalendar(
     schedules,
@@ -109,6 +152,7 @@ function renderCalendar(
 ) {
 
     calendarDays.innerHTML = "";
+
 
     const year =
         currentDate.getFullYear();
@@ -127,6 +171,10 @@ function renderCalendar(
         );
 
 
+    /* ======================================
+       FIRST DAY
+       ====================================== */
+
     const firstDay =
         new Date(
             year,
@@ -134,9 +182,14 @@ function renderCalendar(
             1
         );
 
+
     const firstDayOfWeek =
         firstDay.getDay();
 
+
+    /* ======================================
+       DAYS IN MONTH
+       ====================================== */
 
     const daysInMonth =
         new Date(
@@ -146,6 +199,10 @@ function renderCalendar(
         ).getDate();
 
 
+    /* ======================================
+       DAYS IN PREVIOUS MONTH
+       ====================================== */
+
     const daysInPreviousMonth =
         new Date(
             year,
@@ -154,7 +211,9 @@ function renderCalendar(
         ).getDate();
 
 
-    // PREVIOUS MONTH DAYS
+    /* ======================================
+       PREVIOUS MONTH DAYS
+       ====================================== */
 
     for (
         let i = firstDayOfWeek - 1;
@@ -165,17 +224,22 @@ function renderCalendar(
         const dayNumber =
             daysInPreviousMonth - i;
 
+
         const day =
             createCalendarDay(
                 dayNumber,
                 true
             );
 
+
         calendarDays.appendChild(day);
+
     }
 
 
-    // CURRENT MONTH DAYS
+    /* ======================================
+       CURRENT MONTH
+       ====================================== */
 
     for (
         let dayNumber = 1;
@@ -194,96 +258,118 @@ function renderCalendar(
             `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
 
 
+        /* FIND EVENTS */
+
         const daySchedules =
-            schedules.filter(function (schedule) {
+            schedules.filter(
+                function (schedule) {
 
-                return schedule.event_date ===
-                    dateString;
-
-            });
-
-
-        // ADD EVENTS
-
-        daySchedules.forEach(function (schedule) {
-
-            const event =
-                document.createElement("div");
-
-            event.className =
-                "calendar-event";
-
-
-            const assignedPersonnel =
-                assignments
-                    .filter(function (assignment) {
-
-                        return assignment.schedule_id ===
-                            schedule.id;
-
-                    })
-                    .map(function (assignment) {
-
-                        const person =
-                            personnel.find(function (item) {
-
-                                return item.id ===
-                                    assignment.personnel_id;
-
-                            });
-
-                        return person
-                            ? person.full_name
-                            : "Unknown";
-
-                    });
-
-
-            const personnelText =
-                assignedPersonnel.length > 0
-                    ? assignedPersonnel.join(", ")
-                    : "Unassigned";
-
-
-            event.innerHTML = `
-
-                <strong>
-                    ${escapeHTML(schedule.title)}
-                </strong>
-
-                <small>
-                    ${formatTime(schedule.start_time)}
-                    -
-                    ${formatTime(schedule.end_time)}
-                </small>
-
-                <small>
-                    ${escapeHTML(schedule.location)}
-                </small>
-
-            `;
-
-
-            // ==================================
-            // CLICK EVENT
-            // ==================================
-
-            event.addEventListener(
-                "click",
-                function () {
-
-                    showScheduleDetails(
-                        schedule,
-                        personnelText
-                    );
+                    return schedule.event_date ===
+                        dateString;
 
                 }
             );
 
 
-            day.appendChild(event);
+        /* ==================================
+           ADD EVENTS
+           ================================== */
 
-        });
+        daySchedules.forEach(
+            function (schedule) {
+
+                const event =
+                    document.createElement("div");
+
+
+                event.className =
+                    "calendar-event";
+
+
+                /* FIND ASSIGNED PERSONNEL */
+
+                const assignedPersonnel =
+                    assignments
+                        .filter(
+                            function (assignment) {
+
+                                return assignment.schedule_id ===
+                                    schedule.id;
+
+                            }
+                        )
+                        .map(
+                            function (assignment) {
+
+                                const person =
+                                    personnel.find(
+                                        function (item) {
+
+                                            return item.id ===
+                                                assignment.personnel_id;
+
+                                        }
+                                    );
+
+
+                                return person
+                                    ? person.full_name
+                                    : "Unknown";
+
+                            }
+                        );
+
+
+                const personnelText =
+                    assignedPersonnel.length > 0
+                        ? assignedPersonnel.join(", ")
+                        : "Unassigned";
+
+
+                event.innerHTML = `
+
+                    <strong>
+                        ${escapeHTML(schedule.title)}
+                    </strong>
+
+                    <small>
+                        ${formatTime(schedule.start_time)}
+                        -
+                        ${formatTime(schedule.end_time)}
+                    </small>
+
+                    <small>
+                        ${escapeHTML(schedule.location)}
+                    </small>
+
+                    <small>
+                        👤 ${escapeHTML(personnelText)}
+                    </small>
+
+                `;
+
+
+                /* ==================================
+                   CLICK EVENT
+                   ================================== */
+
+                event.addEventListener(
+                    "click",
+                    function () {
+
+                        showScheduleDetails(
+                            schedule,
+                            personnelText
+                        );
+
+                    }
+                );
+
+
+                day.appendChild(event);
+
+            }
+        );
 
 
         calendarDays.appendChild(day);
@@ -291,7 +377,9 @@ function renderCalendar(
     }
 
 
-    // NEXT MONTH DAYS
+    /* ======================================
+       NEXT MONTH DAYS
+       ====================================== */
 
     const totalCells =
         firstDayOfWeek +
@@ -316,15 +404,17 @@ function renderCalendar(
                 true
             );
 
+
         calendarDays.appendChild(day);
+
     }
 
 }
 
 
-// ==========================================
-// CREATE CALENDAR DAY
-// ==========================================
+/* ==========================================
+   CREATE CALENDAR DAY
+   ========================================== */
 
 function createCalendarDay(
     number,
@@ -333,6 +423,7 @@ function createCalendarDay(
 
     const day =
         document.createElement("div");
+
 
     day.className =
         "calendar-day";
@@ -350,8 +441,10 @@ function createCalendarDay(
     const numberElement =
         document.createElement("div");
 
+
     numberElement.className =
         "calendar-number";
+
 
     numberElement.textContent =
         number;
@@ -363,24 +456,26 @@ function createCalendarDay(
 
 
     return day;
+
 }
 
 
-// ==========================================
-// SHOW SCHEDULE DETAILS
-// ==========================================
+/* ==========================================
+   SHOW SCHEDULE DETAILS
+   ========================================== */
 
 function showScheduleDetails(
     schedule,
     personnelText
 ) {
 
-    // Remove existing modal
+    /* Remove existing modal */
 
     const existingModal =
         document.getElementById(
             "scheduleDetailsModal"
         );
+
 
     if (existingModal) {
         existingModal.remove();
@@ -390,8 +485,57 @@ function showScheduleDetails(
     const modal =
         document.createElement("div");
 
+
     modal.id =
         "scheduleDetailsModal";
+
+
+    /* ======================================
+       ADMIN BUTTONS
+       ====================================== */
+
+    let adminButtons = "";
+
+
+    if (isAdminDashboard) {
+
+        adminButtons = `
+
+            <div
+                style="
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 20px;
+                "
+            >
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="editScheduleButton"
+                    style="flex: 1;"
+                >
+                    Edit
+                </button>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="deleteScheduleButton"
+                    style="
+                        flex: 1;
+                        background: #b42318;
+                    "
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        `;
+
+    }
 
 
     modal.innerHTML = `
@@ -403,7 +547,8 @@ function showScheduleDetails(
                 <button
                     type="button"
                     class="schedule-modal-close"
-                    id="closeScheduleModal">
+                    id="closeScheduleModal"
+                >
                     ×
                 </button>
 
@@ -485,14 +630,18 @@ function showScheduleDetails(
                 </div>
 
 
+                ${adminButtons}
+
+
                 <button
                     type="button"
                     class="primary-button"
-                    id="closeScheduleModalButton">
-
+                    id="closeScheduleModalButton"
+                    style="margin-top: 15px;"
+                >
                     Close
-
                 </button>
+
 
             </div>
 
@@ -506,7 +655,9 @@ function showScheduleDetails(
     );
 
 
-    // Close with X
+    /* ======================================
+       CLOSE WITH X
+       ====================================== */
 
     document
         .getElementById(
@@ -518,7 +669,9 @@ function showScheduleDetails(
         );
 
 
-    // Close with button
+    /* ======================================
+       CLOSE WITH BUTTON
+       ====================================== */
 
     document
         .getElementById(
@@ -530,7 +683,9 @@ function showScheduleDetails(
         );
 
 
-    // Close by clicking outside
+    /* ======================================
+       CLOSE OUTSIDE MODAL
+       ====================================== */
 
     document
         .querySelector(
@@ -553,12 +708,331 @@ function showScheduleDetails(
             }
         );
 
+
+    /* ======================================
+       ADMIN EDIT BUTTON
+       ====================================== */
+
+    if (isAdminDashboard) {
+
+        const editButton =
+            document.getElementById(
+                "editScheduleButton"
+            );
+
+
+        if (editButton) {
+
+            editButton.addEventListener(
+                "click",
+                function () {
+
+                    closeScheduleDetails();
+
+                    editScheduleFromCalendar(
+                        schedule
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* ==================================
+           ADMIN DELETE BUTTON
+           ================================== */
+
+        const deleteButton =
+            document.getElementById(
+                "deleteScheduleButton"
+            );
+
+
+        if (deleteButton) {
+
+            deleteButton.addEventListener(
+                "click",
+                function () {
+
+                    deleteScheduleFromCalendar(
+                        schedule.id
+                    );
+
+                }
+            );
+
+        }
+
+    }
+
 }
 
 
-// ==========================================
-// CLOSE MODAL
-// ==========================================
+/* ==========================================
+   EDIT SCHEDULE FROM CALENDAR
+   ========================================== */
+
+function editScheduleFromCalendar(
+    schedule
+) {
+
+    /* Look for schedule form on dashboard */
+
+    const formContainer =
+        document.getElementById(
+            "scheduleFormContainer"
+        );
+
+
+    const form =
+        document.getElementById(
+            "scheduleForm"
+        );
+
+
+    if (!formContainer || !form) {
+
+        alert(
+            "Schedule editing form could not be found."
+        );
+
+        return;
+
+    }
+
+
+    /* Fill the existing form */
+
+    document.getElementById(
+        "eventName"
+    ).value =
+        schedule.title || "";
+
+
+    document.getElementById(
+        "scheduleDate"
+    ).value =
+        schedule.event_date || "";
+
+
+    document.getElementById(
+        "startTime"
+    ).value =
+        schedule.start_time
+            ? schedule.start_time.substring(
+                0,
+                5
+            )
+            : "";
+
+
+    document.getElementById(
+        "endTime"
+    ).value =
+        schedule.end_time
+            ? schedule.end_time.substring(
+                0,
+                5
+            )
+            : "";
+
+
+    document.getElementById(
+        "location"
+    ).value =
+        schedule.location || "";
+
+
+    document.getElementById(
+        "description"
+    ).value =
+        schedule.description || "";
+
+
+    /*
+       Tell schedules.js which schedule
+       is being edited.
+    */
+
+    if (
+        typeof window.startScheduleEdit ===
+        "function"
+    ) {
+
+        window.startScheduleEdit(
+            schedule.id
+        );
+
+    }
+
+
+    formContainer.style.display =
+        "block";
+
+
+    formContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+
+/* ==========================================
+   DELETE SCHEDULE FROM CALENDAR
+   ========================================== */
+
+async function deleteScheduleFromCalendar(
+    scheduleId
+) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this schedule?\n\nAll personnel assignments for this schedule will also be removed."
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const deleteButton =
+        document.getElementById(
+            "deleteScheduleButton"
+        );
+
+
+    if (deleteButton) {
+
+        deleteButton.disabled =
+            true;
+
+        deleteButton.textContent =
+            "Deleting...";
+
+    }
+
+
+    /* ======================================
+       DELETE ASSIGNMENTS
+       ====================================== */
+
+    const {
+        error: assignmentError
+    } = await supabaseClient
+        .from("assignments")
+        .delete()
+        .eq(
+            "schedule_id",
+            scheduleId
+        );
+
+
+    if (assignmentError) {
+
+        console.error(
+            "Assignment delete error:",
+            assignmentError
+        );
+
+
+        alert(
+            "Could not delete assignments: " +
+            assignmentError.message
+        );
+
+
+        if (deleteButton) {
+
+            deleteButton.disabled =
+                false;
+
+            deleteButton.textContent =
+                "Delete";
+
+        }
+
+        return;
+
+    }
+
+
+    /* ======================================
+       DELETE SCHEDULE
+       ====================================== */
+
+    const {
+        error
+    } = await supabaseClient
+        .from("schedules")
+        .delete()
+        .eq(
+            "id",
+            scheduleId
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Schedule delete error:",
+            error
+        );
+
+
+        alert(
+            "Could not delete schedule: " +
+            error.message
+        );
+
+
+        if (deleteButton) {
+
+            deleteButton.disabled =
+                false;
+
+            deleteButton.textContent =
+                "Delete";
+
+        }
+
+        return;
+
+    }
+
+
+    closeScheduleDetails();
+
+
+    alert(
+        "Schedule deleted successfully!"
+    );
+
+
+    /* Refresh dashboard calendar */
+
+    loadCalendar();
+
+
+    /* Refresh dashboard statistics */
+
+    if (
+        typeof window.loadAdminDashboard ===
+        "function"
+    ) {
+
+        window.loadAdminDashboard();
+
+    }
+
+}
+
+
+/* ==========================================
+   CLOSE MODAL
+   ========================================== */
 
 function closeScheduleDetails() {
 
@@ -566,6 +1040,7 @@ function closeScheduleDetails() {
         document.getElementById(
             "scheduleDetailsModal"
         );
+
 
     if (modal) {
 
@@ -576,9 +1051,9 @@ function closeScheduleDetails() {
 }
 
 
-// ==========================================
-// FORMAT TIME
-// ==========================================
+/* ==========================================
+   FORMAT TIME
+   ========================================== */
 
 function formatTime(time) {
 
@@ -618,12 +1093,13 @@ function formatTime(time) {
 
 
     return `${hour}:${minute} ${period}`;
+
 }
 
 
-// ==========================================
-// HTML SAFETY
-// ==========================================
+/* ==========================================
+   HTML SAFETY
+   ========================================== */
 
 function escapeHTML(value) {
 
@@ -643,12 +1119,13 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
 
 
-// ==========================================
-// MONTH BUTTONS
-// ==========================================
+/* ==========================================
+   MONTH BUTTONS
+   ========================================== */
 
 if (previousMonthBtn) {
 
@@ -703,8 +1180,8 @@ if (todayBtn) {
 }
 
 
-// ==========================================
-// START
-// ==========================================
+/* ==========================================
+   START
+   ========================================== */
 
 loadCalendar();
