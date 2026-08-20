@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Calendar - Media Team</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .calendar-controls h2 {
+            margin: 0;
+            color: #123f6d;
+        }
+
+        .calendar-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .calendar-day-name {
+            background: #f8fafc;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            color: #667085;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .calendar-day {
+            min-height: 130px;
+            padding: 10px;
+            border-top: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .calendar-day.other-month {
+            background: #f8fafc;
+            color: #98a2b3;
+        }
+
+        .calendar-number {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .calendar-event {
+            background: #e8f1fa;
+            color: #123f6d;
+            padding: 7px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .calendar-event strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .calendar-event small {
+            display: block;
+            color: #667085;
+        }
+
+        @media (max-width: 800px) {
+
+            .calendar-day {
+                min-height: 100px;
+                padding: 6px;
+            }
+
+            .calendar-event {
+                font-size: 10px;
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo">
+                MT
+            </div>
+
+            <div>
+                <h2>Media Team</h2>
+                <p>Scheduling System</p>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="admin.html" class="nav-item">
+                Dashboard
+            </a>
+
+            <a href="schedules.html" class="nav-item">
+                Schedules
+            </a>
+
+            <a href="calendar.html" class="nav-item active">
+                Calendar
+            </a>
+
+            <a href="personnel.html" class="nav-item">
+                Personnel
+            </a>
+
+            <a href="#" class="nav-item">
+                Reports
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="#" class="nav-item">
+                Settings
+            </a>
+
+            <a href="index.html" class="nav-item">
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Calendar
+                </h1>
+
+                <p>
+                    View media team schedules by date.
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-circle">
+                    A
+                </div>
+
+                <div>
+
+                    <strong>
+                        Admin
+                    </strong>
+
+                    <small>
+                        Media Director
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="dashboard-section">
+
+            <div class="calendar-controls">
+
+                <div class="calendar-buttons">
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="previousMonthBtn">
+                        ← Previous
+                    </button>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="todayBtn">
+                        Today
+                    </button>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="nextMonthBtn">
+                        Next →
+                    </button>
+
+                </div>
+
+
+                <h2 id="currentMonth">
+                    Loading...
+                </h2>
+
+            </div>
+
+
+            <div class="calendar-grid">
+
+                <div class="calendar-day-name">
+                    Sunday
+                </div>
+
+                <div class="calendar-day-name">
+                    Monday
+                </div>
+
+                <div class="calendar-day-name">
+                    Tuesday
+                </div>
+
+                <div class="calendar-day-name">
+                    Wednesday
+                </div>
+
+                <div class="calendar-day-name">
+                    Thursday
+                </div>
+
+                <div class="calendar-day-name">
+                    Friday
+                </div>
+
+                <div class="calendar-day-name">
+                    Saturday
+                </div>
+
+            </div>
+
+
+            <div
+                id="calendarDays"
+                class="calendar-grid">
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- LOGIN / SUPABASE CLIENT -->
+<script src="script.js"></script>
+
+<!-- CALENDAR -->
+<script src="calendar.js"></script>
+
+</body>
+
+</html>
