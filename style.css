@@ -404,3 +404,59 @@ h1 {
     }
 
 }
+/* =========================================
+   SCHEDULE ROWS
+   ========================================= */
+
+.schedule-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.3fr 1.5fr 1fr;
+    padding: 15px 18px;
+    border-top: 1px solid #e5e7eb;
+    align-items: center;
+    color: #172b4d;
+    font-size: 14px;
+}
+
+.schedule-row > div {
+    padding-right: 10px;
+}
+
+.schedule-row:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================
+   SCHEDULE FORM
+   ========================================= */
+
+#scheduleFormContainer .dashboard-section {
+    margin-top: 0;
+}
+
+#scheduleFormContainer .form-group {
+    margin-bottom: 18px;
+}
+
+#scheduleFormContainer input {
+    background: white;
+}
+
+
+/* =========================================
+   RESPONSIVE SCHEDULE TABLE
+   ========================================= */
+
+@media (max-width: 800px) {
+
+    .schedule-table {
+        overflow-x: auto;
+    }
+
+    .table-header,
+    .schedule-row {
+        min-width: 750px;
+    }
+
+}
