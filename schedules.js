@@ -2084,6 +2084,8 @@ async function editSchedule(event) {
    ========================================== */
 
 async function deleteSchedule(event) {
+   
+   console.log("DELETE BUTTON CLICKED");
 
     const button =
         event.currentTarget;
