@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Personnel - Media Team</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo">
+                MT
+            </div>
+
+            <div>
+                <h2>Media Team</h2>
+                <p>Scheduling System</p>
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+        <nav class="navigation">
+
+            <a href="admin.html" class="nav-item">
+                Dashboard
+            </a>
+
+            <a href="schedules.html" class="nav-item">
+                Schedules
+            </a>
+
+            <a href="#" class="nav-item">
+                Calendar
+            </a>
+
+            <a href="personnel.html" class="nav-item active">
+                Personnel
+            </a>
+
+            <a href="#" class="nav-item">
+                Reports
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="#" class="nav-item">
+                Settings
+            </a>
+
+            <a href="index.html" class="nav-item">
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Personnel
+                </h1>
+
+                <p>
+                    Manage your media team members.
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-circle">
+                    A
+                </div>
+
+                <div>
+
+                    <strong>
+                        Admin
+                    </strong>
+
+                    <small>
+                        Media Director
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PERSONNEL SECTION -->
+        <section class="dashboard-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Media Team Personnel
+                    </h2>
+
+                    <p>
+                        Available personnel for media assignments.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="personnelList">
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        👥
+                    </div>
+
+                    <h3>
+                        Loading personnel...
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- AUTHENTICATION -->
+<script src="script.js"></script>
+
+<!-- PERSONNEL -->
+<script src="personnel.js"></script>
+
+</body>
+
+</html>
