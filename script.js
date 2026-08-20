@@ -48,7 +48,7 @@ if (loginForm) {
         }
 
         console.log("Logged in user:", profile);
-        
+
         if (profile.role === "admin") {
             window.location.href = "admin.html";
         } else if (profile.role === "personnel") {
