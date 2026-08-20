@@ -1,3 +1,5 @@
+console.log("SCHEDULE SCRIPT LOADED");
+
 const createScheduleBtn = document.getElementById("createScheduleBtn");
 const createScheduleEmptyBtn = document.getElementById("createScheduleEmptyBtn");
 const cancelScheduleBtn = document.getElementById("cancelScheduleBtn");
