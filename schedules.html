@@ -17,6 +17,67 @@
         rel="stylesheet"
         href="style.css">
 
+    <style>
+
+        /* =========================================
+           COLLAPSIBLE SECTIONS
+           ========================================= */
+
+        .collapsible-section {
+            margin-bottom: 20px;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible-header h2 {
+            margin: 0;
+        }
+
+        .collapsible-header p {
+            margin-bottom: 0;
+        }
+
+        .collapse-button {
+            border: none;
+            background: #123f6d;
+            color: white;
+            padding: 9px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .collapse-button:hover {
+            opacity: 0.9;
+        }
+
+        .collapsible-content {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .collapsible-content.open {
+            display: block;
+        }
+
+        .collapse-arrow {
+            display: inline-block;
+            margin-left: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .collapse-arrow.open {
+            transform: rotate(180deg);
+        }
+
+    </style>
+
 </head>
 
 
@@ -183,13 +244,13 @@
 
 
         <!-- =========================================
-             SCHEDULE SECTION
+             ALL SCHEDULES
              ========================================= -->
 
-        <div class="dashboard-section">
+        <section class="dashboard-section collapsible-section">
 
 
-            <div class="section-header">
+            <div class="collapsible-header">
 
 
                 <div>
@@ -199,7 +260,7 @@
                     </h2>
 
                     <p>
-                        Create and manage upcoming media duties.
+                        View and manage scheduled media duties.
                     </p>
 
                 </div>
@@ -207,10 +268,18 @@
 
                 <button
                     type="button"
-                    class="primary-button"
-                    id="createScheduleBtn">
+                    class="collapse-button"
+                    id="toggleSchedulesBtn">
 
-                    + Create Schedule
+                    Show
+
+                    <span
+                        class="collapse-arrow"
+                        id="schedulesArrow">
+
+                        ▼
+
+                    </span>
 
                 </button>
 
@@ -219,269 +288,77 @@
 
 
 
-            <!-- =====================================
-                 SCHEDULE TABLE
-                 ===================================== -->
-
-            <div class="schedule-table">
-
-
-                <div class="table-header">
-
-                    <div>
-                        Event
-                    </div>
-
-                    <div>
-                        Date
-                    </div>
-
-                    <div>
-                        Time
-                    </div>
-
-                    <div>
-                        Location
-                    </div>
-
-                    <div>
-                        Personnel
-                    </div>
-
-                </div>
-
-
-
-                <!-- SCHEDULE LIST -->
-
-                <div id="scheduleList">
-
-
-                    <div class="empty-state">
-
-
-                        <div class="empty-icon">
-                            📅
-                        </div>
-
-
-                        <h3>
-                            No schedules yet
-                        </h3>
-
-
-                        <p>
-                            Create your first media schedule
-                            to get started.
-                        </p>
-
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            id="createScheduleEmptyBtn">
-
-                            Create Schedule
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- =====================================
-                 CREATE SCHEDULE FORM
-                 ===================================== -->
+            <!-- SCHEDULE CONTENT -->
 
             <div
-                id="scheduleFormContainer"
-                style="
-                    display: none;
-                    margin-top: 25px;
-                ">
+                id="schedulesContent"
+                class="collapsible-content">
 
 
-                <div class="dashboard-section">
+                <div class="schedule-table">
 
 
-                    <div class="section-header">
-
+                    <div class="table-header">
 
                         <div>
+                            Event
+                        </div>
 
-                            <h2>
-                                Create Schedule
-                            </h2>
+                        <div>
+                            Date
+                        </div>
+
+                        <div>
+                            Time
+                        </div>
+
+                        <div>
+                            Location
+                        </div>
+
+                        <div>
+                            Personnel
+                        </div>
+
+                    </div>
+
+
+                    <div id="scheduleList">
+
+
+                        <div class="empty-state">
+
+
+                            <div class="empty-icon">
+                                📅
+                            </div>
+
+
+                            <h3>
+                                No schedules yet
+                            </h3>
+
 
                             <p>
-                                Add a new media team schedule.
+                                Create your first media schedule
+                                to get started.
                             </p>
+
+
+                            <button
+                                type="button"
+                                class="primary-button"
+                                id="createScheduleEmptyBtn">
+
+                                Create Schedule
+
+                            </button>
+
 
                         </div>
 
 
                     </div>
-
-
-
-                    <form id="scheduleForm">
-
-
-                        <!-- EVENT NAME -->
-
-                        <div class="form-group">
-
-
-                            <label for="eventName">
-                                Event Name
-                            </label>
-
-
-                            <input
-                                type="text"
-                                id="eventName"
-                                placeholder="Example: Sunday Worship Service"
-                                required>
-
-
-                        </div>
-
-
-
-                        <!-- DATE -->
-
-                        <div class="form-group">
-
-
-                            <label for="scheduleDate">
-                                Date
-                            </label>
-
-
-                            <input
-                                type="date"
-                                id="scheduleDate"
-                                required>
-
-
-                        </div>
-
-
-
-                        <!-- START TIME -->
-
-                        <div class="form-group">
-
-
-                            <label for="startTime">
-                                Start Time
-                            </label>
-
-
-                            <input
-                                type="time"
-                                id="startTime"
-                                required>
-
-
-                        </div>
-
-
-
-                        <!-- END TIME -->
-
-                        <div class="form-group">
-
-
-                            <label for="endTime">
-                                End Time
-                            </label>
-
-
-                            <input
-                                type="time"
-                                id="endTime"
-                                required>
-
-
-                        </div>
-
-
-
-                        <!-- LOCATION -->
-
-                        <div class="form-group">
-
-
-                            <label for="location">
-                                Location
-                            </label>
-
-
-                            <input
-                                type="text"
-                                id="location"
-                                placeholder="Example: AUP Chapel"
-                                required>
-
-
-                        </div>
-
-
-
-                        <!-- DESCRIPTION -->
-
-                        <div class="form-group">
-
-
-                            <label for="description">
-                                Description
-                            </label>
-
-
-                            <input
-                                type="text"
-                                id="description"
-                                placeholder="Optional description">
-
-
-                        </div>
-
-
-
-                        <!-- SAVE -->
-
-                        <button
-                            type="submit"
-                            class="primary-button">
-
-                            Save Schedule
-
-                        </button>
-
-
-
-                        <!-- CANCEL -->
-
-                        <button
-                            type="button"
-                            class="primary-button"
-                            id="cancelScheduleBtn"
-                            style="margin-left: 10px;">
-
-                            Cancel
-
-                        </button>
-
-
-                    </form>
 
 
                 </div>
@@ -490,7 +367,198 @@
             </div>
 
 
-        </div>
+        </section>
+
+
+
+        <!-- =========================================
+             CREATE SCHEDULE
+             ========================================= -->
+
+        <section class="dashboard-section collapsible-section">
+
+
+            <div class="collapsible-header">
+
+
+                <div>
+
+                    <h2>
+                        Create Schedule
+                    </h2>
+
+                    <p>
+                        Add a new media team schedule.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="collapse-button"
+                    id="toggleCreateBtn">
+
+                    Show
+
+                    <span
+                        class="collapse-arrow"
+                        id="createArrow">
+
+                        ▼
+
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- CREATE FORM -->
+
+            <div
+                id="createScheduleContent"
+                class="collapsible-content">
+
+
+                <form id="scheduleForm">
+
+
+                    <!-- EVENT NAME -->
+
+                    <div class="form-group">
+
+                        <label for="eventName">
+                            Event Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="eventName"
+                            placeholder="Example: Sunday Worship Service"
+                            required>
+
+                    </div>
+
+
+
+                    <!-- DATE -->
+
+                    <div class="form-group">
+
+                        <label for="scheduleDate">
+                            Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="scheduleDate"
+                            required>
+
+                    </div>
+
+
+
+                    <!-- START TIME -->
+
+                    <div class="form-group">
+
+                        <label for="startTime">
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="startTime"
+                            required>
+
+                    </div>
+
+
+
+                    <!-- END TIME -->
+
+                    <div class="form-group">
+
+                        <label for="endTime">
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="endTime"
+                            required>
+
+                    </div>
+
+
+
+                    <!-- LOCATION -->
+
+                    <div class="form-group">
+
+                        <label for="location">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            placeholder="Example: AUP Chapel"
+                            required>
+
+                    </div>
+
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <input
+                            type="text"
+                            id="description"
+                            placeholder="Optional description">
+
+                    </div>
+
+
+
+                    <!-- BUTTONS -->
+
+                    <button
+                        type="submit"
+                        class="primary-button">
+
+                        Save Schedule
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="cancelScheduleBtn"
+                        style="margin-left: 10px;">
+
+                        Cancel
+
+                    </button>
+
+
+                </form>
+
+
+            </div>
+
+
+        </section>
 
 
     </main>
@@ -523,6 +591,132 @@
      ========================================= -->
 
 <script src="schedules.js"></script>
+
+
+
+<!-- =========================================
+     COLLAPSIBLE SECTIONS
+     ========================================= -->
+
+<script>
+
+    /* =========================================
+       ALL SCHEDULES TOGGLE
+       ========================================= */
+
+    const toggleSchedulesBtn =
+        document.getElementById(
+            "toggleSchedulesBtn"
+        );
+
+    const schedulesContent =
+        document.getElementById(
+            "schedulesContent"
+        );
+
+    const schedulesArrow =
+        document.getElementById(
+            "schedulesArrow"
+        );
+
+
+    if (toggleSchedulesBtn) {
+
+        toggleSchedulesBtn.addEventListener(
+            "click",
+            function () {
+
+                const isOpen =
+                    schedulesContent.classList.toggle(
+                        "open"
+                    );
+
+
+                toggleSchedulesBtn.innerHTML =
+                    isOpen
+                        ? 'Hide <span class="collapse-arrow open">▼</span>'
+                        : 'Show <span class="collapse-arrow">▼</span>';
+
+            }
+        );
+
+    }
+
+
+
+    /* =========================================
+       CREATE SCHEDULE TOGGLE
+       ========================================= */
+
+    const toggleCreateBtn =
+        document.getElementById(
+            "toggleCreateBtn"
+        );
+
+    const createScheduleContent =
+        document.getElementById(
+            "createScheduleContent"
+        );
+
+
+    if (toggleCreateBtn) {
+
+        toggleCreateBtn.addEventListener(
+            "click",
+            function () {
+
+                const isOpen =
+                    createScheduleContent.classList.toggle(
+                        "open"
+                    );
+
+
+                toggleCreateBtn.innerHTML =
+                    isOpen
+                        ? 'Hide <span class="collapse-arrow open">▼</span>'
+                        : 'Show <span class="collapse-arrow">▼</span>';
+
+            }
+        );
+
+    }
+
+
+
+    /* =========================================
+       CREATE BUTTON FROM EMPTY STATE
+       ========================================= */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target &&
+                event.target.id ===
+                    "createScheduleEmptyBtn"
+            ) {
+
+                createScheduleContent.classList.add(
+                    "open"
+                );
+
+
+                toggleCreateBtn.innerHTML =
+                    'Hide <span class="collapse-arrow open">▼</span>';
+
+
+                createScheduleContent.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }
+
+        }
+    );
+
+</script>
 
 
 </body>
