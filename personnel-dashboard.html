@@ -1,276 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Personnel Dashboard - Media Team</title>
-
     <link rel="stylesheet" href="style.css">
+    <style>
+        .personnel-calendar { margin-top: 24px; }
+        .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .calendar-controls { display: flex; align-items: center; gap: 10px; }
+        .calendar-controls button { border: 1px solid #d0d5dd; border-radius: 6px; padding: 5px 10px; background: #fff; color: #123f6d; cursor: pointer; font-size: 18px; }
+        .personnel-weekdays, .personnel-calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+        .personnel-weekdays { margin-top: 18px; }
+        .personnel-weekdays div { color: #667085; text-align: center; font-size: 12px; font-weight: 700; }
+        .personnel-calendar-days { margin-top: 6px; }
+        .personnel-calendar-day { min-height: 88px; padding: 6px; border: 1px solid #eaecf0; border-radius: 7px; background: #fff; }
+        .personnel-calendar-day.muted { background: #f9fafb; }
+        .personnel-calendar-day.today { border: 2px solid #4c8fca; }
+        .day-number { font-size: 12px; font-weight: 700; color: #344054; }
+        .calendar-duty { display: block; width: 100%; overflow: hidden; margin-top: 4px; padding: 4px 5px; border: 0; border-radius: 4px; background: #e8f1fa; color: #123f6d; cursor: pointer; font-size: 11px; font-weight: 700; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+        .calendar-duty:hover { background: #d5e8f8; }
+        .schedule-details-modal { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(16, 24, 40, .52); }
+        .schedule-details-modal.open { display: flex; }
+        .details-card { width: min(620px, 100%); max-height: 90vh; overflow: auto; padding: 26px; border-radius: 12px; background: #fff; box-shadow: 0 20px 50px rgba(0,0,0,.28); }
+        .details-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+        .details-heading h2 { margin: 0; color: #123f6d; }
+        .close-details { border: 0; background: transparent; color: #667085; cursor: pointer; font-size: 28px; line-height: 1; }
+        .details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+        .details-grid div { padding: 12px; border-radius: 8px; background: #f8fafc; }
+        .details-grid dt { margin-bottom: 5px; color: #667085; font-size: 12px; font-weight: 700; }
+        .details-grid dd { margin: 0; color: #172b4d; word-break: break-word; }
+        .details-grid .wide { grid-column: 1 / -1; }
+        .details-button { border: 0; background: transparent; color: #175c9b; cursor: pointer; font: inherit; font-weight: 700; }
+        @media (max-width: 700px) { .personnel-calendar-day { min-height: 62px; } .calendar-duty { font-size: 10px; } .details-grid { grid-template-columns: 1fr; } .details-grid .wide { grid-column: auto; } }
+    </style>
 </head>
-
 <body>
-
 <div class="dashboard">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
-
-        <div class="sidebar-logo">
-
-            <div class="logo">
-                MT
-            </div>
-
-            <div>
-                <h2>Media Team</h2>
-                <p>Scheduling System</p>
-            </div>
-
-        </div>
-
-
+        <div class="sidebar-logo"><div class="logo">MT</div><div><h2>Media Team</h2><p>Scheduling System</p></div></div>
         <nav class="navigation">
-
-            <a href="personnel-dashboard.html"
-               class="nav-item active">
-                Dashboard
-            </a>
-
-            <a href="personnel-schedules.html"
-               class="nav-item">
-                My Schedules
-            </a>
-
+            <a href="personnel-dashboard.html" class="nav-item active">Dashboard</a>
+            <a href="personnel-schedules.html" class="nav-item">My Schedules</a>
         </nav>
-
-
-        <div class="sidebar-bottom">
-
-            <a href="index.html"
-               class="nav-item">
-                Logout
-            </a>
-
-        </div>
-
+        <div class="sidebar-bottom"><button type="button" id="logoutButton" class="nav-item" style="width:100%; border:0; background:transparent; text-align:left; font:inherit; cursor:pointer;">Logout</button></div>
     </aside>
-
-
-    <!-- MAIN CONTENT -->
     <main class="main-content">
-
         <header class="dashboard-header">
-
-            <div>
-
-                <h1>
-                    Personnel Dashboard
-                </h1>
-
-                <p id="welcomeMessage">
-                    Welcome back.
-                </p>
-
-            </div>
-
-
-            <div class="admin-profile">
-
-                <div
-                    class="profile-circle"
-                    id="profileInitial">
-                    P
-                </div>
-
-                <div>
-
-                    <strong id="profileName">
-                        Personnel
-                    </strong>
-
-                    <small>
-                        Media Personnel
-                    </small>
-
-                </div>
-
-            </div>
-
+            <div><h1>Personnel Dashboard</h1><p id="welcomeMessage">Welcome back.</p></div>
+            <div class="admin-profile"><div class="profile-circle" id="profileInitial">P</div><div><strong id="profileName">Personnel</strong><small>Media Personnel</small></div></div>
         </header>
-
-
-        <!-- STATISTICS -->
         <section class="stats-grid">
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    📅
-                </div>
-
-                <div>
-
-                    <p>
-                        My Schedules
-                    </p>
-
-                    <h2 id="totalSchedules">
-                        0
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    📋
-                </div>
-
-                <div>
-
-                    <p>
-                        Upcoming
-                    </p>
-
-                    <h2 id="upcomingSchedules">
-                        0
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    ⏱
-                </div>
-
-                <div>
-
-                    <p>
-                        Assigned Hours
-                    </p>
-
-                    <h2 id="assignedHours">
-                        0 hrs
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    👤
-                </div>
-
-                <div>
-
-                    <p>
-                        Role
-                    </p>
-
-                    <h2 style="font-size: 18px;">
-                        Personnel
-                    </h2>
-
-                </div>
-
-            </div>
-
+            <div class="stat-card"><div class="stat-icon">📅</div><div><p>My Schedules</p><h2 id="totalSchedules">0</h2></div></div>
+            <div class="stat-card"><div class="stat-icon">📋</div><div><p>Upcoming</p><h2 id="upcomingSchedules">0</h2></div></div>
+            <div class="stat-card"><div class="stat-icon">⏱</div><div><p>Assigned Hours</p><h2 id="assignedHours">0 hrs</h2></div></div>
+            <div class="stat-card"><div class="stat-icon">👤</div><div><p>Role</p><h2 style="font-size:18px;">Personnel</h2></div></div>
         </section>
-
-
-        <!-- MY UPCOMING SCHEDULES -->
         <section class="dashboard-section">
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        My Upcoming Schedules
-                    </h2>
-
-                    <p>
-                        Your assigned media duties
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="schedule-table">
-
-                <div class="table-header">
-
-                    <span>
-                        Event
-                    </span>
-
-                    <span>
-                        Date
-                    </span>
-
-                    <span>
-                        Time
-                    </span>
-
-                    <span>
-                        Location
-                    </span>
-
-                    <span>
-                        Description
-                    </span>
-
-                </div>
-
-
-                <div id="myScheduleList">
-
-                    <div class="empty-state">
-
-                        <div class="empty-icon">
-                            📅
-                        </div>
-
-                        <h3>
-                            Loading schedules...
-                        </h3>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+            <div class="section-header"><div><h2>My Upcoming Schedules</h2><p>Your assigned media duties</p></div></div>
+            <div class="schedule-table"><div class="table-header"><span>Event</span><span>Date</span><span>Time</span><span>Location</span><span>Description</span></div><div id="myScheduleList"><div class="empty-state"><div class="empty-icon">📅</div><h3>Loading schedules...</h3></div></div></div>
         </section>
-
+        <section class="dashboard-section personnel-calendar">
+            <div class="section-header calendar-toolbar"><div><h2>My Calendar</h2><p>Click an assigned duty to view its details.</p></div><div class="calendar-controls"><button type="button" id="previousMonth" aria-label="Previous month">‹</button><strong id="calendarMonth"></strong><button type="button" id="nextMonth" aria-label="Next month">›</button></div></div>
+            <div class="personnel-weekdays" aria-hidden="true"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+            <div class="personnel-calendar-days" id="calendarDays"></div>
+        </section>
     </main>
-
 </div>
-
-
-<!-- SUPABASE -->
+<div class="schedule-details-modal" id="scheduleDetailsModal" role="dialog" aria-modal="true" aria-labelledby="detailsTitle"><section class="details-card"><div class="details-heading"><h2 id="detailsTitle">Schedule Details</h2><button class="close-details" type="button" id="closeDetails" aria-label="Close">×</button></div><div id="detailsContent"></div></section></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- SUPABASE LOGIN / CLIENT -->
 <script src="script.js"></script>
-
-<!-- PERSONNEL DASHBOARD -->
 <script src="personnel-dashboard.js"></script>
-
 </body>
-
 </html>
