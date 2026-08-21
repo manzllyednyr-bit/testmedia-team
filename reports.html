@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports & Analytics - Media Team</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .report-stat {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .report-stat p {
+            margin: 0 0 8px;
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .report-stat h2 {
+            margin: 0;
+            color: #123f6d;
+            font-size: 30px;
+        }
+
+        .report-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .report-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .report-section-header h2 {
+            margin: 0;
+            color: #123f6d;
+        }
+
+        .report-section-header p {
+            margin: 5px 0 0;
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .status-card {
+            padding: 18px;
+            border-radius: 10px;
+            background: #f8fafc;
+            text-align: center;
+        }
+
+        .status-card strong {
+            display: block;
+            font-size: 26px;
+            color: #123f6d;
+            margin-bottom: 5px;
+        }
+
+        .status-card span {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .report-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        .report-table th {
+            background: #f8fafc;
+            color: #344054;
+            font-size: 13px;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eaecf0;
+        }
+
+        .report-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #eaecf0;
+            color: #344054;
+            font-size: 14px;
+        }
+
+        .report-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #eef2f6;
+            color: #344054;
+        }
+
+        .hours-value {
+            font-weight: 700;
+            color: #123f6d;
+        }
+
+        .empty-report {
+            padding: 30px;
+            text-align: center;
+            color: #667085;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .report-button {
+            border: none;
+            border-radius: 7px;
+            padding: 9px 14px;
+            background: #123f6d;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .report-button:hover {
+            background: #0d3156;
+        }
+
+        @media (max-width: 1000px) {
+            .reports-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .reports-grid,
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div class="logo">
+                MT
+            </div>
+
+            <div>
+                <h2>Media Team</h2>
+                <p>Scheduling System</p>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="admin.html" class="nav-item">
+                Dashboard
+            </a>
+
+            <a href="schedules.html" class="nav-item">
+                Schedules
+            </a>
+
+            <a href="personnel.html" class="nav-item">
+                Personnel
+            </a>
+
+            <a href="reports.html" class="nav-item active">
+                Reports
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="settings.html" class="nav-item">
+                Settings
+            </a>
+
+            <button
+                type="button"
+                id="logoutButton"
+                class="nav-item"
+                style="
+                    width:100%;
+                    border:0;
+                    background:transparent;
+                    text-align:left;
+                    font:inherit;
+                    cursor:pointer;
+                "
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Reports & Analytics
+                </h1>
+
+                <p>
+                    View schedule and personnel workload information.
+                </p>
+
+            </div>
+
+            <div class="admin-profile">
+
+                <div class="profile-circle" id="profileInitial">
+                    A
+                </div>
+
+                <div>
+
+                    <strong id="profileName">
+                        Admin
+                    </strong>
+
+                    <small>
+                        Media Director
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- SUMMARY -->
+
+        <section class="reports-grid">
+
+            <div class="report-stat">
+
+                <p>
+                    Total Schedules
+                </p>
+
+                <h2 id="totalSchedules">
+                    0
+                </h2>
+
+            </div>
+
+
+            <div class="report-stat">
+
+                <p>
+                    Upcoming Schedules
+                </p>
+
+                <h2 id="upcomingSchedules">
+                    0
+                </h2>
+
+            </div>
+
+
+            <div class="report-stat">
+
+                <p>
+                    Completed Schedules
+                </p>
+
+                <h2 id="completedSchedules">
+                    0
+                </h2>
+
+            </div>
+
+
+            <div class="report-stat">
+
+                <p>
+                    Total Assigned Hours
+                </p>
+
+                <h2 id="totalHours">
+                    0
+                </h2>
+
+            </div>
+
+        </section>
+
+
+        <!-- STATUS -->
+
+        <section class="report-section">
+
+            <div class="report-section-header">
+
+                <div>
+
+                    <h2>
+                        Schedule Status
+                    </h2>
+
+                    <p>
+                        Current status of all schedules.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="status-grid">
+
+                <div class="status-card">
+
+                    <strong id="pendingCount">
+                        0
+                    </strong>
+
+                    <span>
+                        Pending
+                    </span>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <strong id="inProgressCount">
+                        0
+                    </strong>
+
+                    <span>
+                        In Progress
+                    </span>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <strong id="completedCount">
+                        0
+                    </strong>
+
+                    <span>
+                        Completed
+                    </span>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <strong id="cancelledCount">
+                        0
+                    </strong>
+
+                    <span>
+                        Cancelled
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PERSONNEL WORKLOAD -->
+
+        <section class="report-section">
+
+            <div class="report-section-header">
+
+                <div>
+
+                    <h2>
+                        Personnel Workload
+                    </h2>
+
+                    <p>
+                        Assigned schedules and total working hours per personnel.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="report-table-wrapper">
+
+                <table class="report-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Personnel
+                            </th>
+
+                            <th>
+                                Assigned Schedules
+                            </th>
+
+                            <th>
+                                Total Hours
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="personnelReportBody">
+
+                        <tr>
+
+                            <td colspan="3">
+
+                                <div class="empty-report">
+                                    Loading personnel data...
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- UPCOMING SCHEDULES -->
+
+        <section class="report-section">
+
+            <div class="report-section-header">
+
+                <div>
+
+                    <h2>
+                        Upcoming Schedules
+                    </h2>
+
+                    <p>
+                        Scheduled media duties coming up.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="report-table-wrapper">
+
+                <table class="report-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Event
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Personnel
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="upcomingReportBody">
+
+                        <tr>
+
+                            <td colspan="5">
+
+                                <div class="empty-report">
+                                    Loading schedules...
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACTIONS -->
+
+        <section class="report-section">
+
+            <div class="report-section-header">
+
+                <div>
+
+                    <h2>
+                        Reports
+                    </h2>
+
+                    <p>
+                        Refresh the latest information from the database.
+                    </p>
+
+                </div>
+
+                <div class="report-actions">
+
+                    <button
+                        type="button"
+                        id="refreshReports"
+                        class="report-button"
+                    >
+                        Refresh Reports
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="script.js"></script>
+
+<script src="reports.js"></script>
+
+</body>
+
+</html>
