@@ -117,13 +117,22 @@ function calculateHours(startTime, endTime) {
 }
 
 
+function idsMatch(firstId, secondId) {
+
+    return String(firstId) === String(secondId);
+
+}
+
+
 function getScheduleAssignments(scheduleId) {
 
     return assignmentsCache.filter(
         function (assignment) {
 
-            return assignment.schedule_id ===
-                scheduleId;
+            return idsMatch(
+                assignment.schedule_id,
+                scheduleId
+            );
 
         }
     );
@@ -985,7 +994,7 @@ async function editSchedule(scheduleId) {
         schedulesCache.find(
             function (item) {
 
-                return item.id === scheduleId;
+                return idsMatch(item.id, scheduleId);
 
             }
         );
@@ -1074,7 +1083,7 @@ async function deleteSchedule(scheduleId) {
         schedulesCache.find(
             function (item) {
 
-                return item.id === scheduleId;
+                return idsMatch(item.id, scheduleId);
 
             }
         );
@@ -1151,7 +1160,7 @@ function showPersonnelManager(scheduleId) {
         schedulesCache.find(
             function (item) {
 
-                return item.id === scheduleId;
+                return idsMatch(item.id, scheduleId);
 
             }
         );
