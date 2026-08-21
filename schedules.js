@@ -160,6 +160,58 @@ function getPersonnelNames(scheduleId) {
 }
 
 
+/* ==========================================
+   PERSONNEL NOTIFICATIONS
+   ========================================== */
+
+async function createScheduleNotifications(
+    recipientIds,
+    schedule,
+    notificationType,
+    message
+) {
+
+    const uniqueRecipientIds =
+        [...new Set(recipientIds || [])]
+            .filter(Boolean);
+
+    if (uniqueRecipientIds.length === 0) {
+        return;
+    }
+
+    const notifications =
+        uniqueRecipientIds.map(
+            function (recipientId) {
+
+                return {
+                    recipient_id: recipientId,
+                    schedule_id: schedule.id,
+                    type: notificationType,
+                    title: schedule.title,
+                    message: message
+                };
+
+            }
+        );
+
+    const {
+        error
+    } = await supabaseClient
+        .from("notifications")
+        .insert(notifications);
+
+    if (error) {
+
+        console.error(
+            "Notification creation error:",
+            error
+        );
+
+    }
+
+}
+
+
 function openCreateSection() {
 
     const createScheduleContent =
@@ -466,6 +518,7 @@ if (scheduleForm) {
                 if (editingScheduleId) {
 
                     const {
+                        data: updatedSchedule,
                         error
                     } = await supabaseClient
                         .from("schedules")
@@ -480,11 +533,29 @@ if (scheduleForm) {
                         .eq(
                             "id",
                             editingScheduleId
-                        );
+                        )
+                        .select()
+                        .single();
 
                     if (error) {
                         throw error;
                     }
+
+                    await createScheduleNotifications(
+                        getScheduleAssignments(
+                            editingScheduleId
+                        ).map(
+                            function (assignment) {
+
+                                return assignment.personnel_id;
+
+                            }
+                        ),
+                        updatedSchedule,
+                        "schedule_updated",
+                        `The schedule "${title}" has been updated. ` +
+                        `Please review the new date, time, or details.`
+                    );
 
                     alert(
                         "Schedule updated successfully!"
@@ -1258,6 +1329,17 @@ function showPersonnelManager(scheduleId) {
                     }
                 );
 
+            const newlyAssignedIds =
+                selectedIds.filter(
+                    function (personnelId) {
+
+                        return !assignedIds.includes(
+                            personnelId
+                        );
+
+                    }
+                );
+
             const saveButton =
                 form.querySelector(
                     'button[type="submit"]'
@@ -1308,6 +1390,16 @@ function showPersonnelManager(scheduleId) {
                     }
 
                 }
+
+                await createScheduleNotifications(
+                    newlyAssignedIds,
+                    schedule,
+                    "schedule_assigned",
+                    `You have been assigned to "${schedule.title}" on ` +
+                    `${schedule.event_date} from ` +
+                    `${formatTime(schedule.start_time)} to ` +
+                    `${formatTime(schedule.end_time)}.`
+                );
 
                 modal.remove();
 
