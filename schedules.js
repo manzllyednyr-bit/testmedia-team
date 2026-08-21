@@ -1,5 +1,6 @@
 console.log("SCHEDULE SCRIPT LOADED");
 
+
 /* ==========================================
    ELEMENTS
    ========================================== */
@@ -28,8 +29,11 @@ const trackerList =
    ========================================== */
 
 let editingScheduleId = null;
+
 let schedulesCache = [];
+
 let personnelCache = [];
+
 let assignmentsCache = [];
 
 
@@ -151,8 +155,10 @@ function getPersonnelNames(scheduleId) {
                         personnelCache.find(
                             function (item) {
 
-                                return item.id ===
-                                    assignment.personnel_id;
+                                return idsMatch(
+                                    item.id,
+                                    assignment.personnel_id
+                                );
 
                             }
                         );
@@ -221,6 +227,10 @@ async function createScheduleNotifications(
 }
 
 
+/* ==========================================
+   OPEN CREATE SECTION
+   ========================================== */
+
 function openCreateSection() {
 
     const createScheduleContent =
@@ -257,6 +267,10 @@ function openCreateSection() {
 
 }
 
+
+/* ==========================================
+   CLOSE CREATE SECTION
+   ========================================== */
 
 function closeCreateSection() {
 
@@ -326,6 +340,7 @@ function hideScheduleForm() {
     }
 
     updateFormMode();
+
     closeCreateSection();
 
 }
@@ -333,8 +348,6 @@ function hideScheduleForm() {
 
 /* ==========================================
    FORM MODE
-   Works with both the old form container and
-   the current collapsible Create Schedule HTML.
    ========================================== */
 
 function updateFormMode() {
@@ -374,35 +387,47 @@ function updateFormMode() {
     if (editingScheduleId) {
 
         if (formTitle) {
+
             formTitle.textContent =
                 "Edit Schedule";
+
         }
 
         if (formDescription) {
+
             formDescription.textContent =
                 "Update the media team schedule.";
+
         }
 
         if (submitButton) {
+
             submitButton.textContent =
                 "Update Schedule";
+
         }
 
     } else {
 
         if (formTitle) {
+
             formTitle.textContent =
                 "Create Schedule";
+
         }
 
         if (formDescription) {
+
             formDescription.textContent =
                 "Add a new media team schedule.";
+
         }
 
         if (submitButton) {
+
             submitButton.textContent =
                 "Save Schedule";
+
         }
 
     }
@@ -423,10 +448,13 @@ if (createScheduleBtn) {
             editingScheduleId = null;
 
             if (scheduleForm) {
+
                 scheduleForm.reset();
+
             }
 
             updateFormMode();
+
             showScheduleForm();
 
         }
@@ -519,7 +547,9 @@ if (scheduleForm) {
                 );
 
             if (submitButton) {
+
                 submitButton.disabled = true;
+
             }
 
             try {
@@ -621,6 +651,7 @@ if (scheduleForm) {
                 }
 
                 hideScheduleForm();
+
                 await loadSchedules();
 
             } catch (error) {
@@ -638,7 +669,9 @@ if (scheduleForm) {
             } finally {
 
                 if (submitButton) {
+
                     submitButton.disabled = false;
+
                 }
 
             }
@@ -650,7 +683,7 @@ if (scheduleForm) {
 
 
 /* ==========================================
-   LOAD SCHEDULES, PERSONNEL, ASSIGNMENTS
+   LOAD SCHEDULES
    ========================================== */
 
 async function loadSchedules() {
@@ -715,6 +748,7 @@ async function loadSchedules() {
             assignmentsResult.data || [];
 
         renderScheduleList();
+
         renderScheduleTracker();
 
     } catch (error) {
@@ -728,8 +762,15 @@ async function loadSchedules() {
 
             scheduleList.innerHTML = `
                 <div class="empty-state">
-                    <h3>Could not load schedules</h3>
-                    <p>${escapeHTML(error.message)}</p>
+
+                    <h3>
+                        Could not load schedules
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(error.message)}
+                    </p>
+
                 </div>
             `;
 
@@ -803,6 +844,7 @@ function renderScheduleList() {
                                 </strong>
 
                                 <div>
+
                                     ${names.map(
                                         function (name) {
 
@@ -817,12 +859,15 @@ function renderScheduleList() {
                                                         margin: 3px 3px 3px 0;
                                                         font-size: 12px;
                                                     ">
+
                                                     ${escapeHTML(name)}
+
                                                 </span>
                                             `;
 
                                         }
                                     ).join("")}
+
                                 </div>
 
                             </div>
@@ -833,7 +878,9 @@ function renderScheduleList() {
                                     color: #777;
                                     margin-bottom: 8px;
                                 ">
+
                                 Unassigned
+
                             </div>
                         `;
 
@@ -867,7 +914,9 @@ function renderScheduleList() {
                                 class="primary-button"
                                 data-action="manage-personnel"
                                 data-schedule-id="${schedule.id}"
-                                style="margin-top: 8px;">
+                                style="
+                                    margin-top: 8px;
+                                ">
 
                                 Manage Personnel
 
@@ -896,7 +945,9 @@ function renderScheduleList() {
                                     class="primary-button"
                                     data-action="delete-schedule"
                                     data-schedule-id="${schedule.id}"
-                                    style="background: #b42318;">
+                                    style="
+                                        background: #b42318;
+                                    ">
 
                                     Delete
 
@@ -917,7 +968,6 @@ function renderScheduleList() {
 
 /* ==========================================
    EVENT DELEGATION
-   Buttons continue working after list renders.
    ========================================== */
 
 if (scheduleList) {
@@ -946,10 +996,13 @@ if (scheduleList) {
                 editingScheduleId = null;
 
                 if (scheduleForm) {
+
                     scheduleForm.reset();
+
                 }
 
                 updateFormMode();
+
                 showScheduleForm();
 
                 return;
@@ -958,7 +1011,9 @@ if (scheduleList) {
 
             if (action === "edit-schedule") {
 
-                await editSchedule(scheduleId);
+                await editSchedule(
+                    scheduleId
+                );
 
                 return;
 
@@ -966,7 +1021,9 @@ if (scheduleList) {
 
             if (action === "delete-schedule") {
 
-                await deleteSchedule(scheduleId);
+                await deleteSchedule(
+                    scheduleId
+                );
 
                 return;
 
@@ -974,7 +1031,9 @@ if (scheduleList) {
 
             if (action === "manage-personnel") {
 
-                showPersonnelManager(scheduleId);
+                showPersonnelManager(
+                    scheduleId
+                );
 
             }
 
@@ -994,7 +1053,10 @@ async function editSchedule(scheduleId) {
         schedulesCache.find(
             function (item) {
 
-                return idsMatch(item.id, scheduleId);
+                return idsMatch(
+                    item.id,
+                    scheduleId
+                );
 
             }
         );
@@ -1047,14 +1109,20 @@ async function editSchedule(scheduleId) {
         "startTime"
     ).value =
         schedule.start_time
-            ? schedule.start_time.substring(0, 5)
+            ? schedule.start_time.substring(
+                0,
+                5
+            )
             : "";
 
     document.getElementById(
         "endTime"
     ).value =
         schedule.end_time
-            ? schedule.end_time.substring(0, 5)
+            ? schedule.end_time.substring(
+                0,
+                5
+            )
             : "";
 
     document.getElementById(
@@ -1068,6 +1136,7 @@ async function editSchedule(scheduleId) {
         schedule.description || "";
 
     updateFormMode();
+
     showScheduleForm();
 
 }
@@ -1083,7 +1152,10 @@ async function deleteSchedule(scheduleId) {
         schedulesCache.find(
             function (item) {
 
-                return idsMatch(item.id, scheduleId);
+                return idsMatch(
+                    item.id,
+                    scheduleId
+                );
 
             }
         );
@@ -1110,7 +1182,10 @@ async function deleteSchedule(scheduleId) {
         } = await supabaseClient
             .from("assignments")
             .delete()
-            .eq("schedule_id", scheduleId);
+            .eq(
+                "schedule_id",
+                scheduleId
+            );
 
         if (assignmentError) {
             throw assignmentError;
@@ -1121,7 +1196,10 @@ async function deleteSchedule(scheduleId) {
         } = await supabaseClient
             .from("schedules")
             .delete()
-            .eq("id", scheduleId);
+            .eq(
+                "id",
+                scheduleId
+            );
 
         if (scheduleError) {
             throw scheduleError;
@@ -1160,24 +1238,46 @@ function showPersonnelManager(scheduleId) {
         schedulesCache.find(
             function (item) {
 
-                return idsMatch(item.id, scheduleId);
+                return idsMatch(
+                    item.id,
+                    scheduleId
+                );
 
             }
         );
 
     if (!schedule) {
+
+        console.error(
+            "Schedule not found:",
+            scheduleId
+        );
+
         return;
+
     }
 
+
+    /* ======================================
+       GET CURRENT ASSIGNMENTS
+       ====================================== */
+
     const assignedIds =
-        getScheduleAssignments(scheduleId)
-            .map(
-                function (assignment) {
+        getScheduleAssignments(
+            scheduleId
+        )
+        .map(
+            function (assignment) {
 
-                    return assignment.personnel_id;
+                return assignment.personnel_id;
 
-                }
-            );
+            }
+        );
+
+
+    /* ======================================
+       REMOVE EXISTING MODAL
+       ====================================== */
 
     const existingModal =
         document.getElementById(
@@ -1185,45 +1285,77 @@ function showPersonnelManager(scheduleId) {
         );
 
     if (existingModal) {
+
         existingModal.remove();
+
     }
+
+
+    /* ======================================
+       PERSONNEL OPTIONS
+       ====================================== */
 
     const personnelOptions =
         personnelCache.length > 0
+
             ? personnelCache.map(
                 function (person) {
 
                     const isChecked =
-                        assignedIds.includes(person.id)
+                        assignedIds.some(
+                            function (assignedId) {
+
+                                return idsMatch(
+                                    assignedId,
+                                    person.id
+                                );
+
+                            }
+                        )
                             ? "checked"
                             : "";
 
                     return `
                         <label
                             style="
-                                display: block;
-                                margin: 10px 0;
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                margin: 8px 0;
+                                padding: 10px;
+                                background: #f8fafc;
+                                border-radius: 8px;
                                 cursor: pointer;
                             ">
 
                             <input
                                 type="checkbox"
                                 name="personnel"
-                                value="${person.id}"
+                                value="${escapeHTML(person.id)}"
                                 ${isChecked}>
 
-                            ${escapeHTML(person.full_name)}
+                            <span>
+                                ${escapeHTML(
+                                    person.full_name
+                                )}
+                            </span>
 
                         </label>
                     `;
 
                 }
             ).join("")
+
             : `
                 <p>
                     No personnel accounts were found.
                 </p>
             `;
+
+
+    /* ======================================
+       CREATE MODAL
+       ====================================== */
 
     const modal =
         document.createElement("div");
@@ -1242,6 +1374,7 @@ function showPersonnelManager(scheduleId) {
         padding: 20px;
     `;
 
+
     modal.innerHTML = `
         <div
             style="
@@ -1255,19 +1388,35 @@ function showPersonnelManager(scheduleId) {
                 box-sizing: border-box;
             ">
 
-            <h2 style="margin-top: 0;">
+            <h2
+                style="
+                    margin-top: 0;
+                ">
+
                 Manage Personnel
+
             </h2>
 
             <p>
-                ${escapeHTML(schedule.title)}
+
+                ${escapeHTML(
+                    schedule.title
+                )}
+
             </p>
+
 
             <form id="personnelManagerForm">
 
-                <div style="margin: 18px 0;">
+                <div
+                    style="
+                        margin: 18px 0;
+                    ">
+
                     ${personnelOptions}
+
                 </div>
+
 
                 <button
                     type="submit"
@@ -1276,6 +1425,7 @@ function showPersonnelManager(scheduleId) {
                     Save Personnel
 
                 </button>
+
 
                 <button
                     type="button"
@@ -1295,11 +1445,19 @@ function showPersonnelManager(scheduleId) {
         </div>
     `;
 
-    document.body.appendChild(modal);
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    /* ======================================
+       CLOSE MODAL
+       ====================================== */
 
     modal.addEventListener(
         "click",
-        async function (event) {
+        function (event) {
 
             if (
                 event.target === modal ||
@@ -1310,144 +1468,262 @@ function showPersonnelManager(scheduleId) {
 
                 modal.remove();
 
-                return;
-
-            }
-
-            const form =
-                event.target.closest(
-                    "#personnelManagerForm"
-                );
-
-            if (!form || event.type !== "submit") {
-                return;
-            }
-
-            event.preventDefault();
-
-            const selectedIds =
-                Array.from(
-                    form.querySelectorAll(
-                        'input[name="personnel"]:checked'
-                    )
-                ).map(
-                    function (input) {
-
-                        return input.value;
-
-                    }
-                );
-
-            const newlyAssignedIds =
-                selectedIds.filter(
-                    function (personnelId) {
-
-                        return !assignedIds.includes(
-                            personnelId
-                        );
-
-                    }
-                );
-
-            const saveButton =
-                form.querySelector(
-                    'button[type="submit"]'
-                );
-
-            if (saveButton) {
-                saveButton.disabled = true;
-            }
-
-            try {
-
-                const {
-                    error: deleteError
-                } = await supabaseClient
-                    .from("assignments")
-                    .delete()
-                    .eq(
-                        "schedule_id",
-                        scheduleId
-                    );
-
-                if (deleteError) {
-                    throw deleteError;
-                }
-
-                if (selectedIds.length > 0) {
-
-                    const newAssignments =
-                        selectedIds.map(
-                            function (personnelId) {
-
-                                return {
-                                    schedule_id: scheduleId,
-                                    personnel_id: personnelId
-                                };
-
-                            }
-                        );
-
-                    const {
-                        error: insertError
-                    } = await supabaseClient
-                        .from("assignments")
-                        .insert(newAssignments);
-
-                    if (insertError) {
-                        throw insertError;
-                    }
-
-                }
-
-                await createScheduleNotifications(
-                    newlyAssignedIds,
-                    schedule,
-                    "schedule_assigned",
-                    `You have been assigned to "${schedule.title}" on ` +
-                    `${schedule.event_date} from ` +
-                    `${formatTime(schedule.start_time)} to ` +
-                    `${formatTime(schedule.end_time)}.`
-                );
-
-                modal.remove();
-
-                alert(
-                    "Personnel assignments saved!"
-                );
-
-                await loadSchedules();
-
-            } catch (error) {
-
-                console.error(
-                    "Personnel assignment error:",
-                    error
-                );
-
-                alert(
-                    "Could not save personnel: " +
-                    error.message
-                );
-
-            } finally {
-
-                if (saveButton) {
-                    saveButton.disabled = false;
-                }
-
             }
 
         }
     );
+
+
+    /* ======================================
+       GET FORM
+       ====================================== */
+
+    const personnelForm =
+        modal.querySelector(
+            "#personnelManagerForm"
+        );
+
+
+    /* ======================================
+       SAVE PERSONNEL
+       ====================================== */
+
+    if (personnelForm) {
+
+        personnelForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                console.log(
+                    "SAVE PERSONNEL BUTTON CLICKED"
+                );
+
+
+                /* ==========================
+                   GET SELECTED PERSONNEL
+                   ========================== */
+
+                const selectedIds =
+                    Array.from(
+                        personnelForm.querySelectorAll(
+                            'input[name="personnel"]:checked'
+                        )
+                    )
+                    .map(
+                        function (input) {
+
+                            return input.value;
+
+                        }
+                    );
+
+
+                console.log(
+                    "Selected personnel:",
+                    selectedIds
+                );
+
+
+                /* ==========================
+                   FIND NEWLY ASSIGNED
+                   ========================== */
+
+                const newlyAssignedIds =
+                    selectedIds.filter(
+                        function (personnelId) {
+
+                            return !assignedIds.some(
+                                function (assignedId) {
+
+                                    return idsMatch(
+                                        assignedId,
+                                        personnelId
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                /* ==========================
+                   SAVE BUTTON
+                   ========================== */
+
+                const saveButton =
+                    personnelForm.querySelector(
+                        'button[type="submit"]'
+                    );
+
+
+                if (saveButton) {
+
+                    saveButton.disabled = true;
+
+                    saveButton.textContent =
+                        "Saving...";
+
+                }
+
+
+                try {
+
+                    /* ==========================
+                       DELETE OLD ASSIGNMENTS
+                       ========================== */
+
+                    console.log(
+                        "Removing old assignments..."
+                    );
+
+
+                    const {
+                        error: deleteError
+                    } = await supabaseClient
+                        .from("assignments")
+                        .delete()
+                        .eq(
+                            "schedule_id",
+                            scheduleId
+                        );
+
+
+                    if (deleteError) {
+
+                        throw deleteError;
+
+                    }
+
+
+                    /* ==========================
+                       INSERT NEW ASSIGNMENTS
+                       ========================== */
+
+                    if (
+                        selectedIds.length > 0
+                    ) {
+
+                        const newAssignments =
+                            selectedIds.map(
+                                function (personnelId) {
+
+                                    return {
+                                        schedule_id:
+                                            scheduleId,
+
+                                        personnel_id:
+                                            personnelId
+                                    };
+
+                                }
+                            );
+
+
+                        console.log(
+                            "Saving assignments:",
+                            newAssignments
+                        );
+
+
+                        const {
+                            data,
+                            error: insertError
+                        } = await supabaseClient
+                            .from("assignments")
+                            .insert(
+                                newAssignments
+                            )
+                            .select();
+
+
+                        if (insertError) {
+
+                            throw insertError;
+
+                        }
+
+
+                        console.log(
+                            "Assignments saved:",
+                            data
+                        );
+
+                    }
+
+
+                    /* ==========================
+                       NOTIFICATIONS
+                       ========================== */
+
+                    await createScheduleNotifications(
+                        newlyAssignedIds,
+                        schedule,
+                        "schedule_assigned",
+                        `You have been assigned to "${schedule.title}" on ` +
+                        `${schedule.event_date} from ` +
+                        `${formatTime(schedule.start_time)} to ` +
+                        `${formatTime(schedule.end_time)}.`
+                    );
+
+
+                    /* ==========================
+                       CLOSE MODAL
+                       ========================== */
+
+                    modal.remove();
+
+
+                    alert(
+                        "Personnel assignments saved!"
+                    );
+
+
+                    /* ==========================
+                       RELOAD SCHEDULES
+                       ========================== */
+
+                    await loadSchedules();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Personnel assignment error:",
+                        error
+                    );
+
+
+                    alert(
+                        "Could not save personnel: " +
+                        error.message
+                    );
+
+
+                    if (saveButton) {
+
+                        saveButton.disabled = false;
+
+                        saveButton.textContent =
+                            "Save Personnel";
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
 
 }
 
 
 /* ==========================================
    SCHEDULE TRACKER
-   Fields are saved on the schedules table:
-   equipment, status, colorgrader_id, remarks.
    ========================================== */
 
 function renderScheduleTracker() {
@@ -1460,6 +1736,7 @@ function renderScheduleTracker() {
 
         trackerList.innerHTML = `
             <tr>
+
                 <td
                     colspan="8"
                     class="tracker-empty">
@@ -1482,6 +1759,7 @@ function renderScheduleTracker() {
                     </div>
 
                 </td>
+
             </tr>
         `;
 
@@ -1489,38 +1767,54 @@ function renderScheduleTracker() {
 
     }
 
+
     const colorgraderOptions =
         [
             `<option value="">Select person</option>`,
+
             ...personnelCache.map(
                 function (person) {
 
                     return `
-                        <option value="${person.id}">
-                            ${escapeHTML(person.full_name)}
+                        <option
+                            value="${escapeHTML(person.id)}">
+
+                            ${escapeHTML(
+                                person.full_name
+                            )}
+
                         </option>
                     `;
 
                 }
             )
+
         ].join("");
+
 
     trackerList.innerHTML =
         schedulesCache.map(
             function (schedule) {
 
                 const names =
-                    getPersonnelNames(schedule.id);
+                    getPersonnelNames(
+                        schedule.id
+                    );
 
                 return `
-                    <tr data-schedule-id="${schedule.id}">
+                    <tr
+                        data-schedule-id="${schedule.id}">
 
                         <td>
-                            ${escapeHTML(schedule.event_date)}
+                            ${escapeHTML(
+                                schedule.event_date
+                            )}
                         </td>
 
                         <td>
-                            ${escapeHTML(schedule.title)}
+                            ${escapeHTML(
+                                schedule.title
+                            )}
                         </td>
 
                         <td>
@@ -1531,15 +1825,25 @@ function renderScheduleTracker() {
                         </td>
 
                         <td>
-                            ${names.length > 0
-                                ? names.map(
-                                    escapeHTML
-                                ).join(", ")
-                                : "Unassigned"
+                            ${
+                                names.length > 0
+                                    ? names
+                                        .map(
+                                            function (name) {
+
+                                                return escapeHTML(
+                                                    name
+                                                );
+
+                                            }
+                                        )
+                                        .join(", ")
+                                    : "Unassigned"
                             }
                         </td>
 
                         <td>
+
                             <input
                                 type="text"
                                 class="tracker-equipment"
@@ -1547,10 +1851,13 @@ function renderScheduleTracker() {
                                     schedule.equipment || ""
                                 )}"
                                 placeholder="Equipment">
+
                         </td>
 
                         <td>
-                            <select class="tracker-status">
+
+                            <select
+                                class="tracker-status">
 
                                 <option value="">
                                     Select status
@@ -1558,50 +1865,73 @@ function renderScheduleTracker() {
 
                                 <option
                                     value="Pending"
-                                    ${schedule.status === "Pending"
-                                        ? "selected"
-                                        : ""
+                                    ${
+                                        schedule.status ===
+                                        "Pending"
+                                            ? "selected"
+                                            : ""
                                     }>
+
                                     Pending
+
                                 </option>
 
                                 <option
                                     value="In Progress"
-                                    ${schedule.status === "In Progress"
-                                        ? "selected"
-                                        : ""
+                                    ${
+                                        schedule.status ===
+                                        "In Progress"
+                                            ? "selected"
+                                            : ""
                                     }>
+
                                     In Progress
+
                                 </option>
 
                                 <option
                                     value="Completed"
-                                    ${schedule.status === "Completed"
-                                        ? "selected"
-                                        : ""
+                                    ${
+                                        schedule.status ===
+                                        "Completed"
+                                            ? "selected"
+                                            : ""
                                     }>
+
                                     Completed
+
                                 </option>
 
                                 <option
                                     value="Cancelled"
-                                    ${schedule.status === "Cancelled"
-                                        ? "selected"
-                                        : ""
+                                    ${
+                                        schedule.status ===
+                                        "Cancelled"
+                                            ? "selected"
+                                            : ""
                                     }>
+
                                     Cancelled
+
                                 </option>
 
                             </select>
+
                         </td>
 
                         <td>
-                            <select class="tracker-colorgrader">
+
+                            <select
+                                class="tracker-colorgrader">
+
                                 ${colorgraderOptions}
+
                             </select>
+
                         </td>
 
                         <td>
+
                             <textarea
                                 class="tracker-remarks"
                                 rows="2"
@@ -1622,6 +1952,7 @@ function renderScheduleTracker() {
                                 Save
 
                             </button>
+
                         </td>
 
                     </tr>
@@ -1629,6 +1960,7 @@ function renderScheduleTracker() {
 
             }
         ).join("");
+
 
     schedulesCache.forEach(
         function (schedule) {
@@ -1659,6 +1991,10 @@ function renderScheduleTracker() {
 
 }
 
+
+/* ==========================================
+   TRACKER SAVE
+   ========================================== */
 
 if (trackerList) {
 
@@ -1706,7 +2042,9 @@ if (trackerList) {
                 ).value.trim();
 
             button.disabled = true;
-            button.textContent = "Saving...";
+
+            button.textContent =
+                "Saving...";
 
             try {
 
@@ -1715,18 +2053,29 @@ if (trackerList) {
                 } = await supabaseClient
                     .from("schedules")
                     .update({
-                        equipment: equipment,
-                        status: status,
-                        colorgrader_id: colorgraderId,
-                        remarks: remarks
+                        equipment:
+                            equipment,
+
+                        status:
+                            status,
+
+                        colorgrader_id:
+                            colorgraderId,
+
+                        remarks:
+                            remarks
                     })
-                    .eq("id", scheduleId);
+                    .eq(
+                        "id",
+                        scheduleId
+                    );
 
                 if (error) {
                     throw error;
                 }
 
-                button.textContent = "Saved";
+                button.textContent =
+                    "Saved";
 
                 await loadSchedules();
 
@@ -1743,7 +2092,9 @@ if (trackerList) {
                 );
 
                 button.disabled = false;
-                button.textContent = "Save";
+
+                button.textContent =
+                    "Save";
 
             }
 
@@ -1758,4 +2109,5 @@ if (trackerList) {
    ========================================== */
 
 updateFormMode();
+
 loadSchedules();
