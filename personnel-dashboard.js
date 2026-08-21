@@ -1,428 +1,118 @@
-console.log("PERSONNEL DASHBOARD SCRIPT LOADED");
-
-
-const myScheduleList =
-    document.getElementById("myScheduleList");
-
-const totalSchedules =
-    document.getElementById("totalSchedules");
-
-const upcomingSchedules =
-    document.getElementById("upcomingSchedules");
-
-const assignedHours =
-    document.getElementById("assignedHours");
-
-const profileName =
-    document.getElementById("profileName");
-
-const profileInitial =
-    document.getElementById("profileInitial");
-
-const welcomeMessage =
-    document.getElementById("welcomeMessage");
-
-
-async function loadPersonnelDashboard() {
-
-    if (!myScheduleList) {
-        return;
-    }
-
-
-    /* GET CURRENT USER */
-
-    const {
-        data: { user },
-        error: userError
-    } = await supabaseClient.auth.getUser();
-
-
-    if (userError || !user) {
-
-        alert("You are not logged in.");
-
-        window.location.href = "index.html";
-
-        return;
-
-    }
-
-
-    /* GET PROFILE */
-
-    const {
-        data: profile,
-        error: profileError
-    } = await supabaseClient
-        .from("profiles")
-        .select("id, full_name, role")
-        .eq("id", user.id)
-        .single();
-
-
-    if (profileError || !profile) {
-
-        console.error(
-            "Profile error:",
-            profileError
-        );
-
-        alert(
-            "Your personnel profile could not be found."
-        );
-
-        return;
-
-    }
-
-
-    /* VERIFY PERSONNEL ROLE */
-
-    if (profile.role !== "personnel") {
-
-        alert(
-            "This page is for personnel accounts."
-        );
-
-        window.location.href = "admin.html";
-
-        return;
-
-    }
-
-
-    /* DISPLAY PROFILE */
-
-    profileName.textContent =
-        profile.full_name;
-
-    welcomeMessage.textContent =
-        "Welcome back, " + profile.full_name + ".";
-
-    profileInitial.textContent =
-        profile.full_name
-            .charAt(0)
-            .toUpperCase();
-
-
-    /* GET ASSIGNMENTS */
-
-    const {
-        data: assignments,
-        error: assignmentError
-    } = await supabaseClient
-        .from("assignments")
-        .select("id, schedule_id")
-        .eq("personnel_id", profile.id);
-
-
-    if (assignmentError) {
-
-        console.error(
-            "Assignment error:",
-            assignmentError
-        );
-
-        myScheduleList.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    ⚠️
-                </div>
-
-                <h3>
-                    Could not load schedules
-                </h3>
-
-                <p>
-                    ${assignmentError.message}
-                </p>
-
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    if (!assignments || assignments.length === 0) {
-
-        totalSchedules.textContent = "0";
-
-        upcomingSchedules.textContent = "0";
-
-        assignedHours.textContent = "0 hrs";
-
-
-        myScheduleList.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    📅
-                </div>
-
-                <h3>
-                    No schedules assigned
-                </h3>
-
-                <p>
-                    You currently have no assigned media duties.
-                </p>
-
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    /* GET SCHEDULE IDS */
-
-    const scheduleIds =
-        assignments.map(function (assignment) {
-
-            return assignment.schedule_id;
-
-        });
-
-
-    /* GET SCHEDULES */
-
-    const {
-        data: schedules,
-        error: scheduleError
-    } = await supabaseClient
-        .from("schedules")
-        .select("*")
-        .in("id", scheduleIds)
-        .order("event_date", {
-            ascending: true
-        })
-        .order("start_time", {
-            ascending: true
-        });
-
-
-    if (scheduleError) {
-
-        console.error(
-            "Schedule error:",
-            scheduleError
-        );
-
-        return;
-
-    }
-
-
-    /* TODAY */
-
-    const today =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-
-    /* UPCOMING */
-
-    const upcoming =
-        schedules.filter(function (schedule) {
-
-            return schedule.event_date >= today;
-
-        });
-
-
-    /* TOTAL SCHEDULES */
-
-    totalSchedules.textContent =
-        schedules.length;
-
-
-    /* UPCOMING */
-
-    upcomingSchedules.textContent =
-        upcoming.length;
-
-
-    /* ASSIGNED HOURS */
-
-    let totalHours = 0;
-
-
-    schedules.forEach(function (schedule) {
-
-        const start =
-            timeToMinutes(
-                schedule.start_time
-            );
-
-        const end =
-            timeToMinutes(
-                schedule.end_time
-            );
-
-
-        if (end > start) {
-
-            totalHours +=
-                (end - start) / 60;
-
-        }
-
-    });
-
-
-    assignedHours.textContent =
-        `${totalHours.toFixed(1)} hrs`;
-
-
-    /* DISPLAY SCHEDULES */
-
-    myScheduleList.innerHTML = "";
-
-
-    upcoming.forEach(function (schedule) {
-
-        const row =
-            document.createElement("div");
-
-        row.className =
-            "schedule-row";
-
-
-        row.innerHTML = `
-
-            <div>
-                ${schedule.title}
-            </div>
-
-            <div>
-                ${schedule.event_date}
-            </div>
-
-            <div>
-                ${formatTime(schedule.start_time)}
-                -
-                ${formatTime(schedule.end_time)}
-            </div>
-
-            <div>
-                ${schedule.location}
-            </div>
-
-            <div>
-                ${schedule.description || "No description"}
-            </div>
-
-        `;
-
-
-        myScheduleList.appendChild(row);
-
-    });
-
-
-    if (upcoming.length === 0) {
-
-        myScheduleList.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    📅
-                </div>
-
-                <h3>
-                    No upcoming schedules
-                </h3>
-
-                <p>
-                    Your assigned schedules are in the past.
-                </p>
-
-            </div>
-        `;
-
-    }
-
+const welcomeMessage = document.getElementById("welcomeMessage");
+const profileName = document.getElementById("profileName");
+const profileInitial = document.getElementById("profileInitial");
+const totalSchedules = document.getElementById("totalSchedules");
+const upcomingSchedules = document.getElementById("upcomingSchedules");
+const assignedHours = document.getElementById("assignedHours");
+const myScheduleList = document.getElementById("myScheduleList");
+const calendarDays = document.getElementById("calendarDays");
+const calendarMonth = document.getElementById("calendarMonth");
+const scheduleDetailsModal = document.getElementById("scheduleDetailsModal");
+const detailsContent = document.getElementById("detailsContent");
+
+let mySchedules = [];
+let currentMonth = new Date();
+currentMonth.setDate(1);
+
+const escapeHTML = value => String(value ?? "").replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[character]));
+const scheduleDate = value => new Date(`${value}T00:00:00`);
+const formatDate = value => scheduleDate(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+
+function formatTime(schedule) {
+    const format = time => {
+        if (!time) return "—";
+        const [hours, minutes] = time.slice(0, 5).split(":").map(Number);
+        return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    };
+    return `${format(schedule.start_time)} – ${format(schedule.end_time)}`;
 }
 
-
-/* ==========================================
-   TIME FUNCTIONS
-   ========================================== */
-
-function timeToMinutes(time) {
-
-    if (!time) {
-        return 0;
-    }
-
-
-    const parts =
-        time.split(":");
-
-
-    const hours =
-        parseInt(parts[0]);
-
-
-    const minutes =
-        parseInt(parts[1]);
-
-
-    return (
-        hours * 60 +
-        minutes
-    );
-
+function getHours(schedule) {
+    if (!schedule.start_time || !schedule.end_time) return 0;
+    const [startHour, startMinute] = schedule.start_time.slice(0, 5).split(":").map(Number);
+    const [endHour, endMinute] = schedule.end_time.slice(0, 5).split(":").map(Number);
+    let minutes = endHour * 60 + endMinute - (startHour * 60 + startMinute);
+    if (minutes < 0) minutes += 1440;
+    return minutes / 60;
 }
 
+function formatHours(hours) { return `${Number.isInteger(hours) ? hours : hours.toFixed(1)} hrs`; }
 
-function formatTime(time) {
-
-    if (!time) {
-        return "";
-    }
-
-
-    const parts =
-        time.split(":");
-
-
-    let hour =
-        parseInt(parts[0]);
-
-
-    const minute =
-        parts[1];
-
-
-    const period =
-        hour >= 12
-            ? "PM"
-            : "AM";
-
-
-    hour =
-        hour % 12;
-
-
-    if (hour === 0) {
-        hour = 12;
-    }
-
-
-    return `${hour}:${minute} ${period}`;
-
+function showError(message) {
+    myScheduleList.innerHTML = `<div class="empty-state"><h3>${escapeHTML(message)}</h3></div>`;
+    calendarDays.innerHTML = "";
 }
 
+async function loadDashboard() {
+    if (!window.supabaseClient) return showError("Supabase is not connected. Check script.js.");
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) return window.location.replace("index.html");
+    const { data: profile, error: profileError } = await supabaseClient.from("profiles").select("id, full_name, role").eq("id", user.id).maybeSingle();
+    if (profileError || !profile) return showError("Your personnel profile could not be loaded.");
+    if (profile.role && profile.role.toLowerCase() !== "personnel") return window.location.replace("admin.html");
+    const name = profile.full_name || "Personnel";
+    welcomeMessage.textContent = `Welcome back, ${name}.`;
+    profileName.textContent = name;
+    profileInitial.textContent = name.charAt(0).toUpperCase();
+    const { data: assignments, error: assignmentError } = await supabaseClient.from("assignments").select("schedule_id").eq("personnel_id", user.id);
+    if (assignmentError) return showError(`Could not load assignments: ${assignmentError.message}`);
+    const scheduleIds = [...new Set((assignments || []).map(item => item.schedule_id).filter(Boolean))];
+    if (scheduleIds.length) {
+        const { data, error } = await supabaseClient.from("schedules").select("id, title, event_date, start_time, end_time, location, description, equipment, status, remarks").in("id", scheduleIds).order("event_date", { ascending: true }).order("start_time", { ascending: true });
+        if (error) return showError(`Could not load schedules: ${error.message}`);
+        mySchedules = data || [];
+    }
+    renderDashboard();
+}
 
-/* ==========================================
-   START
-   ========================================== */
+function renderDashboard() {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const upcoming = mySchedules.filter(schedule => scheduleDate(schedule.event_date) >= today);
+    totalSchedules.textContent = mySchedules.length;
+    upcomingSchedules.textContent = upcoming.length;
+    assignedHours.textContent = formatHours(mySchedules.reduce((sum, schedule) => sum + getHours(schedule), 0));
+    renderScheduleList(upcoming);
+    renderCalendar();
+}
 
-loadPersonnelDashboard();
+function renderScheduleList(upcoming) {
+    if (!upcoming.length) {
+        myScheduleList.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><h3>No upcoming schedules</h3><p>New assigned duties will appear here.</p></div>';
+        return;
+    }
+    myScheduleList.innerHTML = upcoming.map(schedule => `<div class="schedule-row"><span>${escapeHTML(schedule.title)}</span><span>${escapeHTML(formatDate(schedule.event_date))}</span><span>${escapeHTML(formatTime(schedule))}</span><span>${escapeHTML(schedule.location || "—")}</span><span><button type="button" class="details-button" data-schedule-id="${escapeHTML(schedule.id)}">View details</button></span></div>`).join("");
+    bindDetailsButtons(myScheduleList);
+}
+
+function renderCalendar() {
+    const year = currentMonth.getFullYear(); const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1).getDay(); const totalDays = new Date(year, month + 1, 0).getDate();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    calendarMonth.textContent = currentMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+    let output = "";
+    for (let index = 0; index < firstDay; index += 1) output += '<div class="personnel-calendar-day muted"></div>';
+    for (let day = 1; day <= totalDays; day += 1) {
+        const date = new Date(year, month, day);
+        const schedules = mySchedules.filter(schedule => { const itemDate = scheduleDate(schedule.event_date); return itemDate.getFullYear() === year && itemDate.getMonth() === month && itemDate.getDate() === day; });
+        output += `<div class="personnel-calendar-day${date.getTime() === today.getTime() ? " today" : ""}"><div class="day-number">${day}</div>${schedules.map(schedule => `<button type="button" class="calendar-duty" title="${escapeHTML(schedule.title)}" data-schedule-id="${escapeHTML(schedule.id)}">${escapeHTML(schedule.title)}</button>`).join("")}</div>`;
+    }
+    calendarDays.innerHTML = output;
+    bindDetailsButtons(calendarDays);
+}
+
+function bindDetailsButtons(container) { container.querySelectorAll("[data-schedule-id]").forEach(button => button.addEventListener("click", () => showDetails(button.dataset.scheduleId))); }
+
+function showDetails(scheduleId) {
+    const schedule = mySchedules.find(item => String(item.id) === String(scheduleId)); if (!schedule) return;
+    const value = item => escapeHTML(item || "Not specified");
+    document.getElementById("detailsTitle").textContent = schedule.title || "Schedule Details";
+    detailsContent.innerHTML = `<dl class="details-grid"><div><dt>Date</dt><dd>${escapeHTML(formatDate(schedule.event_date))}</dd></div><div><dt>Time</dt><dd>${escapeHTML(formatTime(schedule))}</dd></div><div><dt>Location</dt><dd>${value(schedule.location)}</dd></div><div><dt>Assigned Hours</dt><dd>${formatHours(getHours(schedule))}</dd></div><div><dt>Status</dt><dd>${value(schedule.status)}</dd></div><div><dt>Equipment</dt><dd>${value(schedule.equipment)}</dd></div><div class="wide"><dt>Description</dt><dd>${value(schedule.description)}</dd></div><div class="wide"><dt>Remarks</dt><dd>${value(schedule.remarks)}</dd></div></dl>`;
+    scheduleDetailsModal.classList.add("open");
+}
+
+document.getElementById("previousMonth").addEventListener("click", () => { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); });
+document.getElementById("nextMonth").addEventListener("click", () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); });
+document.getElementById("closeDetails").addEventListener("click", () => scheduleDetailsModal.classList.remove("open"));
+scheduleDetailsModal.addEventListener("click", event => { if (event.target === scheduleDetailsModal) scheduleDetailsModal.classList.remove("open"); });
+document.getElementById("logoutButton").addEventListener("click", async () => { if (window.supabaseClient) await supabaseClient.auth.signOut(); window.location.replace("index.html"); });
+loadDashboard();
