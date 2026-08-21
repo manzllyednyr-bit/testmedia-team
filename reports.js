@@ -3,63 +3,93 @@ console.log("REPORTS SCRIPT LOADED");
 
 /* ==========================================
    ELEMENTS
-========================================== */
-
-const profileName =
-    document.getElementById("profileName");
-
-const profileInitial =
-    document.getElementById("profileInitial");
+   ========================================== */
 
 const totalSchedules =
-    document.getElementById("totalSchedules");
+    document.getElementById(
+        "totalSchedules"
+    );
 
 const upcomingSchedules =
-    document.getElementById("upcomingSchedules");
+    document.getElementById(
+        "upcomingSchedules"
+    );
 
 const completedSchedules =
-    document.getElementById("completedSchedules");
+    document.getElementById(
+        "completedSchedules"
+    );
 
 const totalHours =
-    document.getElementById("totalHours");
+    document.getElementById(
+        "totalHours"
+    );
+
+const totalPersonnelHours =
+    document.getElementById(
+        "totalPersonnelHours"
+    );
 
 const pendingCount =
-    document.getElementById("pendingCount");
+    document.getElementById(
+        "pendingCount"
+    );
 
 const inProgressCount =
-    document.getElementById("inProgressCount");
+    document.getElementById(
+        "inProgressCount"
+    );
 
 const completedCount =
-    document.getElementById("completedCount");
+    document.getElementById(
+        "completedCount"
+    );
 
 const cancelledCount =
-    document.getElementById("cancelledCount");
+    document.getElementById(
+        "cancelledCount"
+    );
 
-const personnelReportBody =
-    document.getElementById("personnelReportBody");
+const personnelWorkload =
+    document.getElementById(
+        "personnelWorkload"
+    );
 
-const upcomingReportBody =
-    document.getElementById("upcomingReportBody");
+const upcomingScheduleReport =
+    document.getElementById(
+        "upcomingScheduleReport"
+    );
 
-const refreshReports =
-    document.getElementById("refreshReports");
+const profileName =
+    document.getElementById(
+        "profileName"
+    );
+
+const profileInitial =
+    document.getElementById(
+        "profileInitial"
+    );
 
 const logoutButton =
-    document.getElementById("logoutButton");
+    document.getElementById(
+        "logoutButton"
+    );
 
 
 /* ==========================================
    DATA
-========================================== */
+   ========================================== */
 
-let schedules = [];
-let personnel = [];
-let assignments = [];
+let schedulesCache = [];
+
+let personnelCache = [];
+
+let assignmentsCache = [];
 
 
 /* ==========================================
    HELPERS
-========================================== */
+   ========================================== */
 
 function escapeHTML(value) {
 
@@ -77,7 +107,10 @@ function escapeHTML(value) {
 }
 
 
-function idsMatch(firstId, secondId) {
+function idsMatch(
+    firstId,
+    secondId
+) {
 
     return String(firstId) ===
         String(secondId);
@@ -85,64 +118,57 @@ function idsMatch(firstId, secondId) {
 }
 
 
-function formatTime(time) {
+function calculateHours(
+    startTime,
+    endTime
+) {
 
-    if (!time) {
-        return "";
-    }
+    if (
+        !startTime ||
+        !endTime
+    ) {
 
-    const parts =
-        time.substring(0, 5).split(":");
-
-    let hours =
-        Number(parts[0]);
-
-    const minutes =
-        parts[1];
-
-    const suffix =
-        hours >= 12
-            ? "PM"
-            : "AM";
-
-    hours =
-        hours % 12 || 12;
-
-    return `${hours}:${minutes} ${suffix}`;
-
-}
-
-
-function calculateHours(startTime, endTime) {
-
-    if (!startTime || !endTime) {
         return 0;
+
     }
 
-    const start =
+
+    const startParts =
         startTime
             .substring(0, 5)
             .split(":");
 
-    const end =
+    const endParts =
         endTime
             .substring(0, 5)
             .split(":");
 
+
     const startMinutes =
-        Number(start[0]) * 60 +
-        Number(start[1]);
+        Number(startParts[0]) * 60 +
+        Number(startParts[1]);
+
 
     const endMinutes =
-        Number(end[0]) * 60 +
-        Number(end[1]);
+        Number(endParts[0]) * 60 +
+        Number(endParts[1]);
+
 
     let difference =
-        endMinutes - startMinutes;
+        endMinutes -
+        startMinutes;
+
+
+    /*
+       Supports schedules that pass midnight.
+    */
 
     if (difference < 0) {
-        difference += 1440;
+
+        difference += 24 * 60;
+
     }
+
 
     return difference / 60;
 
@@ -151,180 +177,276 @@ function calculateHours(startTime, endTime) {
 
 function formatHours(hours) {
 
-    const value =
-        Number(hours);
+    const number =
+        Number(hours) || 0;
 
-    if (Number.isInteger(value)) {
 
-        return `${value} hrs`;
+    if (
+        Number.isInteger(number)
+    ) {
+
+        return `${number} hr${number === 1 ? "" : "s"}`;
 
     }
 
-    return `${value.toFixed(1)} hrs`;
+
+    return `${number.toFixed(1)} hrs`;
 
 }
 
 
-function getScheduleAssignments(scheduleId) {
+function formatTime(time) {
 
-    return assignments.filter(
-        function (assignment) {
+    if (!time) {
 
-            return idsMatch(
-                assignment.schedule_id,
-                scheduleId
-            );
+        return "";
 
+    }
+
+
+    const parts =
+        time
+            .substring(0, 5)
+            .split(":");
+
+
+    let hours =
+        Number(parts[0]);
+
+    const minutes =
+        parts[1];
+
+
+    const period =
+        hours >= 12
+            ? "PM"
+            : "AM";
+
+
+    hours =
+        hours % 12 || 12;
+
+
+    return `${hours}:${minutes} ${period}`;
+
+}
+
+
+function formatDate(dateValue) {
+
+    if (!dateValue) {
+
+        return "";
+
+    }
+
+
+    const date =
+        new Date(
+            `${dateValue}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return dateValue;
+
+    }
+
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric"
         }
     );
 
 }
 
 
-function getPersonnelNames(scheduleId) {
+function getToday() {
 
-    return getScheduleAssignments(
-        scheduleId
-    ).map(
-        function (assignment) {
+    const today =
+        new Date();
 
-            const person =
-                personnel.find(
-                    function (item) {
-
-                        return idsMatch(
-                            item.id,
-                            assignment.personnel_id
-                        );
-
-                    }
-                );
-
-            return person
-                ? person.full_name
-                : "Unknown";
-
-        }
+    today.setHours(
+        0,
+        0,
+        0,
+        0
     );
+
+    return today;
+
+}
+
+
+function getScheduleDate(
+    dateValue
+) {
+
+    if (!dateValue) {
+
+        return null;
+
+    }
+
+
+    const date =
+        new Date(
+            `${dateValue}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    return date;
+
+}
+
+
+/* ==========================================
+   LOAD ADMIN PROFILE
+   ========================================== */
+
+async function loadAdminProfile() {
+
+    const {
+        data: authData,
+        error: authError
+    } =
+        await supabaseClient
+            .auth
+            .getUser();
+
+
+    if (
+        authError ||
+        !authData ||
+        !authData.user
+    ) {
+
+        window.location.replace(
+            "index.html"
+        );
+
+        return null;
+
+    }
+
+
+    const user =
+        authData.user;
+
+
+    const {
+        data: profile,
+        error: profileError
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select(
+                "id, full_name, role"
+            )
+            .eq(
+                "id",
+                user.id
+            )
+            .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            "Profile loading error:",
+            profileError
+        );
+
+        alert(
+            "Could not load your profile."
+        );
+
+        return null;
+
+    }
+
+
+    if (!profile) {
+
+        alert(
+            "Your profile could not be found."
+        );
+
+        return null;
+
+    }
+
+
+    if (
+        profile.role &&
+        profile.role.toLowerCase() !==
+            "admin"
+    ) {
+
+        window.location.replace(
+            "personnel-dashboard.html"
+        );
+
+        return null;
+
+    }
+
+
+    const name =
+        profile.full_name ||
+        "Admin";
+
+
+    if (profileName) {
+
+        profileName.textContent =
+            name;
+
+    }
+
+
+    if (profileInitial) {
+
+        profileInitial.textContent =
+            name
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+
+    return user;
 
 }
 
 
 /* ==========================================
    LOAD REPORT DATA
-========================================== */
+   ========================================== */
 
-async function loadReports() {
-
-    if (
-        typeof supabaseClient ===
-        "undefined"
-    ) {
-
-        alert(
-            "Supabase is not connected."
-        );
-
-        return;
-
-    }
-
+async function loadReportData() {
 
     try {
-
-        const {
-            data: {
-                user
-            },
-            error: authError
-        } =
-            await supabaseClient
-                .auth
-                .getUser();
-
-
-        if (
-            authError ||
-            !user
-        ) {
-
-            window.location.replace(
-                "index.html"
-            );
-
-            return;
-
-        }
-
-
-        /* ==================================
-           GET ADMIN PROFILE
-        ================================== */
-
-        const {
-            data: profile,
-            error: profileError
-        } =
-            await supabaseClient
-                .from("profiles")
-                .select(
-                    "id, full_name, role"
-                )
-                .eq(
-                    "id",
-                    user.id
-                )
-                .single();
-
-
-        if (profileError) {
-
-            throw profileError;
-
-        }
-
-
-        if (
-            profile.role &&
-            profile.role.toLowerCase() !==
-            "admin"
-        ) {
-
-            window.location.replace(
-                "personnel-dashboard.html"
-            );
-
-            return;
-
-        }
-
-
-        const name =
-            profile.full_name ||
-            "Admin";
-
-
-        if (profileName) {
-
-            profileName.textContent =
-                name;
-
-        }
-
-
-        if (profileInitial) {
-
-            profileInitial.textContent =
-                name
-                    .charAt(0)
-                    .toUpperCase();
-
-        }
-
-
-        /* ==================================
-           LOAD DATABASE DATA
-        ================================== */
 
         const results =
             await Promise.all([
@@ -348,7 +470,7 @@ async function loadReports() {
                 supabaseClient
                     .from("profiles")
                     .select(
-                        "id, full_name"
+                        "id, full_name, role"
                     )
                     .eq(
                         "role",
@@ -380,42 +502,95 @@ async function loadReports() {
             results[2];
 
 
-        if (schedulesResult.error) {
+        if (
+            schedulesResult.error
+        ) {
+
             throw schedulesResult.error;
+
         }
 
-        if (personnelResult.error) {
+
+        if (
+            personnelResult.error
+        ) {
+
             throw personnelResult.error;
+
         }
 
-        if (assignmentsResult.error) {
+
+        if (
+            assignmentsResult.error
+        ) {
+
             throw assignmentsResult.error;
+
         }
 
 
-        schedules =
+        schedulesCache =
             schedulesResult.data || [];
 
-        personnel =
+
+        personnelCache =
             personnelResult.data || [];
 
-        assignments =
+
+        assignmentsCache =
             assignmentsResult.data || [];
 
 
-        renderReports();
+        console.log(
+            "Schedules:",
+            schedulesCache
+        );
+
+        console.log(
+            "Personnel:",
+            personnelCache
+        );
+
+        console.log(
+            "Assignments:",
+            assignmentsCache
+        );
+
+
+        renderReport();
 
     } catch (error) {
 
         console.error(
-            "Reports loading error:",
+            "Report loading error:",
             error
         );
 
-        alert(
-            "Could not load reports: " +
-            error.message
-        );
+
+        if (personnelWorkload) {
+
+            personnelWorkload.innerHTML = `
+                <div class="empty-report">
+                    Could not load report data.
+                    <br>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </div>
+            `;
+
+        }
+
+
+        if (upcomingScheduleReport) {
+
+            upcomingScheduleReport.innerHTML = `
+                <div class="empty-report">
+                    Could not load upcoming schedules.
+                </div>
+            `;
+
+        }
 
     }
 
@@ -423,10 +598,10 @@ async function loadReports() {
 
 
 /* ==========================================
-   RENDER REPORTS
-========================================== */
+   RENDER ENTIRE REPORT
+   ========================================== */
 
-function renderReports() {
+function renderReport() {
 
     renderSummary();
 
@@ -441,19 +616,22 @@ function renderReports() {
 
 /* ==========================================
    SUMMARY
-========================================== */
+   ========================================== */
 
 function renderSummary() {
 
-    const today =
-        new Date();
+    const schedules =
+        schedulesCache;
 
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
+
+    /*
+       UPCOMING
+       A schedule is upcoming when
+       its date is today or later.
+    */
+
+    const today =
+        getToday();
 
 
     const upcoming =
@@ -461,32 +639,108 @@ function renderSummary() {
             function (schedule) {
 
                 const date =
-                    new Date(
-                        `${schedule.event_date}T00:00:00`
+                    getScheduleDate(
+                        schedule.event_date
                     );
 
-                return date >= today;
+                return date &&
+                    date >= today;
 
             }
         );
 
+
+    /*
+       COMPLETED
+       Based on the schedule status.
+    */
 
     const completed =
         schedules.filter(
             function (schedule) {
 
-                return (
-                    schedule.status ===
-                    "Completed"
-                );
+                return String(
+                    schedule.status || ""
+                ).toLowerCase() ===
+                    "completed";
 
             }
         );
 
 
-    const hours =
+    /*
+       TOTAL SCHEDULED HOURS
+
+       Each schedule is counted
+       ONLY ONCE.
+
+       Example:
+       Schedule A = 12 hours
+       Schedule B = 9 hours
+
+       Total Scheduled Hours = 21 hours
+    */
+
+    const scheduledHours =
         schedules.reduce(
-            function (total, schedule) {
+            function (
+                total,
+                schedule
+            ) {
+
+                return total +
+                    calculateHours(
+                        schedule.start_time,
+                        schedule.end_time
+                    );
+
+            },
+            0
+        );
+
+
+    /*
+       TOTAL PERSONNEL HOURS
+
+       Each assignment gets the
+       duration of its schedule.
+
+       Example:
+
+       Gene = 21 hours
+       Michael = 9 hours
+
+       Total Personnel Hours = 30 hours
+    */
+
+    const personnelHours =
+        assignmentsCache.reduce(
+            function (
+                total,
+                assignment
+            ) {
+
+                const schedule =
+                    schedules.find(
+                        function (
+                            item
+                        ) {
+
+                            return idsMatch(
+                                item.id,
+                                assignment.schedule_id
+                            );
+
+                        }
+                    );
+
+
+                if (!schedule) {
+
+                    return total;
+
+                }
+
 
                 return total +
                     calculateHours(
@@ -526,7 +780,19 @@ function renderSummary() {
     if (totalHours) {
 
         totalHours.textContent =
-            formatHours(hours);
+            formatHours(
+                scheduledHours
+            );
+
+    }
+
+
+    if (totalPersonnelHours) {
+
+        totalPersonnelHours.textContent =
+            formatHours(
+                personnelHours
+            );
 
     }
 
@@ -534,38 +800,60 @@ function renderSummary() {
 
 
 /* ==========================================
-   STATUS
-========================================== */
+   STATUS REPORT
+   ========================================== */
 
 function renderStatus() {
 
-    const counts = {
+    let pending = 0;
 
-        Pending: 0,
+    let inProgress = 0;
 
-        "In Progress": 0,
+    let completed = 0;
 
-        Completed: 0,
-
-        Cancelled: 0
-
-    };
+    let cancelled = 0;
 
 
-    schedules.forEach(
+    schedulesCache.forEach(
         function (schedule) {
 
             const status =
-                schedule.status;
+                String(
+                    schedule.status || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
 
             if (
-                Object.prototype.hasOwnProperty.call(
-                    counts,
-                    status
-                )
+                status === "pending"
             ) {
 
-                counts[status]++;
+                pending++;
+
+            }
+
+            else if (
+                status === "in progress"
+            ) {
+
+                inProgress++;
+
+            }
+
+            else if (
+                status === "completed"
+            ) {
+
+                completed++;
+
+            }
+
+            else if (
+                status === "cancelled"
+            ) {
+
+                cancelled++;
 
             }
 
@@ -573,50 +861,61 @@ function renderStatus() {
     );
 
 
-    pendingCount.textContent =
-        counts.Pending;
+    if (pendingCount) {
 
-    inProgressCount.textContent =
-        counts["In Progress"];
+        pendingCount.textContent =
+            pending;
 
-    completedCount.textContent =
-        counts.Completed;
+    }
 
-    cancelledCount.textContent =
-        counts.Cancelled;
+
+    if (inProgressCount) {
+
+        inProgressCount.textContent =
+            inProgress;
+
+    }
+
+
+    if (completedCount) {
+
+        completedCount.textContent =
+            completed;
+
+    }
+
+
+    if (cancelledCount) {
+
+        cancelledCount.textContent =
+            cancelled;
+
+    }
 
 }
 
 
 /* ==========================================
    PERSONNEL WORKLOAD
-========================================== */
+   ========================================== */
 
 function renderPersonnelWorkload() {
 
-    if (!personnelReportBody) {
+    if (!personnelWorkload) {
+
         return;
+
     }
 
 
-    if (personnel.length === 0) {
+    if (
+        personnelCache.length === 0
+    ) {
 
-        personnelReportBody.innerHTML = `
-
-            <tr>
-
-                <td colspan="3">
-
-                    <div class="empty-report">
-
-                        No personnel accounts found.
-
-                    </div>
-
-                </td>
-
-            </tr>
-
+        personnelWorkload.innerHTML = `
+            <div class="empty-report">
+                No personnel accounts found.
+            </div>
         `;
 
         return;
@@ -624,13 +923,20 @@ function renderPersonnelWorkload() {
     }
 
 
-    personnelReportBody.innerHTML =
-        personnel.map(
+    const workload =
+        personnelCache.map(
             function (person) {
 
-                const personAssignments =
-                    assignments.filter(
-                        function (assignment) {
+                /*
+                   Find assignments belonging
+                   to this personnel.
+                */
+
+                const assignments =
+                    assignmentsCache.filter(
+                        function (
+                            assignment
+                        ) {
 
                             return idsMatch(
                                 assignment.personnel_id,
@@ -641,19 +947,48 @@ function renderPersonnelWorkload() {
                     );
 
 
+                /*
+                   Avoid counting the same
+                   schedule twice for the
+                   same person if duplicate
+                   assignment rows exist.
+                */
+
+                const uniqueScheduleIds =
+                    [
+                        ...new Set(
+                            assignments.map(
+                                function (
+                                    assignment
+                                ) {
+
+                                    return String(
+                                        assignment.schedule_id
+                                    );
+
+                                }
+                            )
+                        )
+                    ];
+
+
                 let hours = 0;
 
 
-                personAssignments.forEach(
-                    function (assignment) {
+                uniqueScheduleIds.forEach(
+                    function (
+                        scheduleId
+                    ) {
 
                         const schedule =
-                            schedules.find(
-                                function (item) {
+                            schedulesCache.find(
+                                function (
+                                    item
+                                ) {
 
                                     return idsMatch(
                                         item.id,
-                                        assignment.schedule_id
+                                        scheduleId
                                     );
 
                                 }
@@ -674,98 +1009,198 @@ function renderPersonnelWorkload() {
                 );
 
 
-                return `
+                return {
 
-                    <tr>
+                    name:
+                        person.full_name ||
+                        "Unnamed",
 
-                        <td>
+                    scheduleCount:
+                        uniqueScheduleIds.length,
 
-                            ${escapeHTML(
-                                person.full_name ||
-                                "Unnamed"
-                            )}
+                    hours:
+                        hours
 
-                        </td>
-
-                        <td>
-
-                            ${personAssignments.length}
-
-                        </td>
-
-                        <td class="hours-value">
-
-                            ${formatHours(hours)}
-
-                        </td>
-
-                    </tr>
-
-                `;
+                };
 
             }
-        ).join("");
+        );
+
+
+    /*
+       Put people with the most
+       assigned hours first.
+    */
+
+    workload.sort(
+        function (
+            first,
+            second
+        ) {
+
+            return second.hours -
+                first.hours;
+
+        }
+    );
+
+
+    personnelWorkload.innerHTML = `
+
+        <table class="report-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Personnel
+                    </th>
+
+                    <th>
+                        Assigned Schedules
+                    </th>
+
+                    <th>
+                        Total Hours
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${
+                    workload.map(
+                        function (
+                            person
+                        ) {
+
+                            return `
+
+                                <tr>
+
+                                    <td>
+                                        ${escapeHTML(
+                                            person.name
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${person.scheduleCount}
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            ${formatHours(
+                                                person.hours
+                                            )}
+                                        </strong>
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }
+                    ).join("")
+                }
+
+            </tbody>
+
+        </table>
+
+    `;
 
 }
 
 
 /* ==========================================
    UPCOMING SCHEDULES
-========================================== */
+   ========================================== */
 
 function renderUpcomingSchedules() {
 
-    if (!upcomingReportBody) {
+    if (!upcomingScheduleReport) {
+
         return;
+
     }
 
 
     const today =
-        new Date();
-
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
+        getToday();
 
 
     const upcoming =
-        schedules
+        schedulesCache
             .filter(
-                function (schedule) {
+                function (
+                    schedule
+                ) {
 
                     const date =
-                        new Date(
-                            `${schedule.event_date}T00:00:00`
+                        getScheduleDate(
+                            schedule.event_date
                         );
 
-                    return date >= today;
+                    return date &&
+                        date >= today;
 
                 }
             )
-            .slice(0, 20);
+            .sort(
+                function (
+                    first,
+                    second
+                ) {
+
+                    const firstDate =
+                        getScheduleDate(
+                            first.event_date
+                        );
+
+                    const secondDate =
+                        getScheduleDate(
+                            second.event_date
+                        );
 
 
-    if (upcoming.length === 0) {
+                    if (
+                        firstDate &&
+                        secondDate &&
+                        firstDate.getTime() !==
+                            secondDate.getTime()
+                    ) {
 
-        upcomingReportBody.innerHTML = `
+                        return firstDate -
+                            secondDate;
 
-            <tr>
+                    }
 
-                <td colspan="5">
 
-                    <div class="empty-report">
+                    return String(
+                        first.start_time || ""
+                    ).localeCompare(
+                        String(
+                            second.start_time || ""
+                        )
+                    );
 
-                        No upcoming schedules.
+                }
+            );
 
-                    </div>
 
-                </td>
+    if (
+        upcoming.length === 0
+    ) {
 
-            </tr>
-
+        upcomingScheduleReport.innerHTML = `
+            <div class="empty-report">
+                There are no upcoming schedules.
+            </div>
         `;
 
         return;
@@ -773,129 +1208,168 @@ function renderUpcomingSchedules() {
     }
 
 
-    upcomingReportBody.innerHTML =
-        upcoming.map(
-            function (schedule) {
+    upcomingScheduleReport.innerHTML = `
 
-                const names =
-                    getPersonnelNames(
-                        schedule.id
-                    );
+        <table class="report-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Event
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Location
+                    </th>
+
+                    <th>
+                        Personnel
+                    </th>
+
+                </tr>
+
+            </thead>
 
 
-                return `
+            <tbody>
 
-                    <tr>
+                ${
+                    upcoming.map(
+                        function (
+                            schedule
+                        ) {
 
-                        <td>
+                            const assignedNames =
+                                assignmentsCache
+                                    .filter(
+                                        function (
+                                            assignment
+                                        ) {
 
-                            ${escapeHTML(
-                                schedule.title
-                            )}
+                                            return idsMatch(
+                                                assignment.schedule_id,
+                                                schedule.id
+                                            );
 
-                        </td>
+                                        }
+                                    )
+                                    .map(
+                                        function (
+                                            assignment
+                                        ) {
 
-                        <td>
+                                            const person =
+                                                personnelCache.find(
+                                                    function (
+                                                        item
+                                                    ) {
 
-                            ${escapeHTML(
-                                schedule.event_date
-                            )}
+                                                        return idsMatch(
+                                                            item.id,
+                                                            assignment.personnel_id
+                                                        );
 
-                        </td>
-
-                        <td>
-
-                            ${formatTime(
-                                schedule.start_time
-                            )}
-
-                            -
-
-                            ${formatTime(
-                                schedule.end_time
-                            )}
-
-                        </td>
-
-                        <td>
-
-                            ${escapeHTML(
-                                schedule.location ||
-                                "Not specified"
-                            )}
-
-                        </td>
-
-                        <td>
-
-                            ${
-                                names.length > 0
-                                    ? names
-                                        .map(
-                                            function (name) {
-
-                                                return escapeHTML(
-                                                    name
+                                                    }
                                                 );
 
-                                            }
-                                        )
-                                        .join(", ")
-                                    : "Unassigned"
-                            }
 
-                        </td>
+                                            return person
+                                                ? person.full_name
+                                                : "Unknown";
 
-                    </tr>
-
-                `;
-
-            }
-        ).join("");
-
-}
+                                        }
+                                    );
 
 
-/* ==========================================
-   REFRESH
-========================================== */
-
-if (refreshReports) {
-
-    refreshReports.addEventListener(
-        "click",
-        async function () {
-
-            refreshReports.disabled =
-                true;
-
-            refreshReports.textContent =
-                "Refreshing...";
+                            const uniqueNames =
+                                [
+                                    ...new Set(
+                                        assignedNames
+                                    )
+                                ];
 
 
-            try {
+                            return `
 
-                await loadReports();
+                                <tr>
 
-            } finally {
+                                    <td>
+                                        ${escapeHTML(
+                                            schedule.title
+                                        )}
+                                    </td>
 
-                refreshReports.disabled =
-                    false;
+                                    <td>
+                                        ${escapeHTML(
+                                            formatDate(
+                                                schedule.event_date
+                                            )
+                                        )}
+                                    </td>
 
-                refreshReports.textContent =
-                    "Refresh Reports";
+                                    <td>
+                                        ${escapeHTML(
+                                            formatTime(
+                                                schedule.start_time
+                                            )
+                                        )}
+                                        -
+                                        ${escapeHTML(
+                                            formatTime(
+                                                schedule.end_time
+                                            )
+                                        )}
+                                    </td>
 
-            }
+                                    <td>
+                                        ${escapeHTML(
+                                            schedule.location ||
+                                            "Not specified"
+                                        )}
+                                    </td>
 
-        }
-    );
+                                    <td>
+                                        ${
+                                            uniqueNames.length > 0
+                                                ? escapeHTML(
+                                                    uniqueNames.join(
+                                                        ", "
+                                                    )
+                                                )
+                                                : "Unassigned"
+                                        }
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }
+                    ).join("")
+                }
+
+            </tbody>
+
+        </table>
+
+    `;
 
 }
 
 
 /* ==========================================
    LOGOUT
-========================================== */
+   ========================================== */
 
 if (logoutButton) {
 
@@ -903,14 +1377,25 @@ if (logoutButton) {
         "click",
         async function () {
 
-            if (
-                typeof supabaseClient !==
-                "undefined"
-            ) {
+            try {
 
-                await supabaseClient
-                    .auth
-                    .signOut();
+                if (
+                    typeof supabaseClient !==
+                    "undefined"
+                ) {
+
+                    await supabaseClient
+                        .auth
+                        .signOut();
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
 
             }
 
@@ -926,7 +1411,39 @@ if (logoutButton) {
 
 
 /* ==========================================
-   INITIAL LOAD
-========================================== */
+   INITIALIZE
+   ========================================== */
 
-loadReports();
+async function initializeReports() {
+
+    if (
+        typeof supabaseClient ===
+        "undefined"
+    ) {
+
+        console.error(
+            "supabaseClient is not available."
+        );
+
+        return;
+
+    }
+
+
+    const user =
+        await loadAdminProfile();
+
+
+    if (!user) {
+
+        return;
+
+    }
+
+
+    await loadReportData();
+
+}
+
+
+initializeReports();
