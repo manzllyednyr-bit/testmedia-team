@@ -44,7 +44,7 @@ function showError(message) {
 }
 
 async function loadDashboard() {
-    if (!window.supabaseClient) return showError("Supabase is not connected. Check script.js.");
+    if (typeof supabaseClient === "undefined") return showError("Supabase is not connected. Check script.js.");
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) return window.location.replace("index.html");
     const { data: profile, error: profileError } = await supabaseClient.from("profiles").select("id, full_name, role").eq("id", user.id).maybeSingle();
@@ -68,6 +68,11 @@ async function loadDashboard() {
 function renderDashboard() {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const upcoming = mySchedules.filter(schedule => scheduleDate(schedule.event_date) >= today);
+    const calendarStartSchedule = upcoming[0] || mySchedules[0];
+    if (calendarStartSchedule) {
+        currentMonth = scheduleDate(calendarStartSchedule.event_date);
+        currentMonth.setDate(1);
+    }
     totalSchedules.textContent = mySchedules.length;
     upcomingSchedules.textContent = upcoming.length;
     assignedHours.textContent = formatHours(mySchedules.reduce((sum, schedule) => sum + getHours(schedule), 0));
@@ -114,5 +119,5 @@ document.getElementById("previousMonth").addEventListener("click", () => { curre
 document.getElementById("nextMonth").addEventListener("click", () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); });
 document.getElementById("closeDetails").addEventListener("click", () => scheduleDetailsModal.classList.remove("open"));
 scheduleDetailsModal.addEventListener("click", event => { if (event.target === scheduleDetailsModal) scheduleDetailsModal.classList.remove("open"); });
-document.getElementById("logoutButton").addEventListener("click", async () => { if (window.supabaseClient) await supabaseClient.auth.signOut(); window.location.replace("index.html"); });
+document.getElementById("logoutButton").addEventListener("click", async () => { if (typeof supabaseClient !== "undefined") await supabaseClient.auth.signOut(); window.location.replace("index.html"); });
 loadDashboard();
